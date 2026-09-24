@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Firebase</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+            min-height: 100vh;
+            padding: 1rem;
+            color: white;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 1rem;
+            backdrop-filter: blur(10px);
+        }
+        h1 { margin-bottom: 1rem; font-size: 1.5rem; }
+        .status {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            font-family: monospace;
+            font-size: 0.9rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .status.error { color: #ff6b6b; border: 2px solid #ff6b6b; }
+        .status.success { color: #51cf66; border: 2px solid #51cf66; }
+        .status.pending { color: #ffd43b; border: 2px solid #ffd43b; }
+        input, button {
+            width: 100%;
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+        }
+        input {
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+        }
+        button {
+            background: #ec4899;
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+        button:hover { background: #ec5fb8; }
+        .info {
+            background: rgba(100, 200, 255, 0.2);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Teste Firebase</h1>
+
+        <div class="status pending" id="status">
+            Carregando Firebase... ⏳
+        </div>
+
+        <h3 style="margin-top: 1.5rem; margin-bottom: 0.5rem;">Email</h3>
+        <input type="email" id="email" placeholder="danifragat@gmail.com" value="danifragat@gmail.com">
+
+        <h3 style="margin-top: 1rem; margin-bottom: 0.5rem;">Senha</h3>
+        <input type="password" id="password" placeholder="Digite uma senha">
+
+        <button onclick="testarLogin()">Testar Login</button>
+        <button onclick="testarCriarConta()">Testar Criar Conta</button>
+
+        <div class="info">
+            <strong>Info:</strong> Este arquivo é para diagnosticar problemas com o Firebase. Se funcionar aqui, o problema está no arquivo principal.
+        </div>
+    </div>
+
+    <!-- Firebase (Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-compat/app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-compat/auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-compat/database.js"></script>
+
+    <script>
+        const statusEl = document.getElementById('status');
+
+        function log(msg, type = 'info') {
+            console.log(msg);
+            const time = new Date().toLocaleTimeString('pt-BR');
+            statusEl.innerHTML += `<div>[${time}] ${msg}</div>`;
+            statusEl.scrollTop = statusEl.scrollHeight;
+
+            if (type === 'error') statusEl.className = 'status error';
+            else if (type === 'success') statusEl.className = 'status success';
+        }
+
+        try {
+            log('✅ Script carregado', 'info');
+
+            const firebaseConfig = {
+                apiKey: "AIzaSyCrbmmAnMK_NGEHcYj5ZxF7eOJmSGNDp1s",
+                authDomain: "skincare-traker.firebaseapp.com",
+                databaseURL: "https://skincare-traker.firebaseio.com",
+                projectId: "skincare-traker",
+                storageBucket: "skincare-traker.firebasestorage.app",
+                messagingSenderId: "201395673110",
+                appId: "1:201395673110:web:d827e5e396b1f6806e3d37"
+            };
+
+            log('🔄 Inicializando Firebase...', 'pending');
+            firebase.initializeApp(firebaseConfig);
+            log('✅ Firebase inicializado!', 'success');
+
+            const auth = firebase.auth();
+            log('✅ Auth carregado!', 'success');
+
+        } catch (error) {
+            log('❌ ERRO NA INICIALIZAÇÃO: ' + error.message, 'error');
+            log('Stack: ' + error.stack, 'error');
+        }
+
+        async function testarLogin() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            if (!email || !password) {
+                log('❌ Email e senha são obrigatórios!', 'error');
+                return;
+            }
+
+            log(`🔄 Tentando login com: ${email}...`, 'pending');
+
+            try {
+                const result = await firebase.auth().signInWithEmailAndPassword(email, password);
+                log('✅ LOGIN SUCESSO!', 'success');
+                log('UID: ' + result.user.uid, 'success');
+            } catch (error) {
+                log('❌ ERRO NO LOGIN: ' + error.message, 'error');
+                log('Código: ' + error.code, 'error');
+            }
+        }
+
+        async function testarCriarConta() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            if (!email || !password) {
+                log('❌ Email e senha são obrigatórios!', 'error');
+                return;
+            }
+
+            log(`🔄 Tentando criar conta: ${email}...`, 'pending');
+
+            try {
+                const result = await firebase.auth().createUserWithEmailAndPassword(email, password);
+                log('✅ CONTA CRIADA!', 'success');
+                log('UID: ' + result.user.uid, 'success');
+            } catch (error) {
+                log('❌ ERRO AO CRIAR: ' + error.message, 'error');
+                log('Código: ' + error.code, 'error');
+            }
+        }
+
+        // Log state changes
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+                log('👤 Usuário autenticado: ' + user.email, 'success');
+            } else {
+                log('🔓 Nenhum usuário autenticado', 'info');
+            }
+        });
+
+    </script>
+</body>
+</html>
