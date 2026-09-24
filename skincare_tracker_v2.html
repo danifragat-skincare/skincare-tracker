@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Rastreador de skincare + GHK-Cu">
+    <meta name="theme-color" content="#7c3aed">
+    <title>Skincare Tracker v2</title>
+    <link rel="manifest" href="data:application/manifest+json,%7B%22name%22:%22Skincare%20Tracker%22,%22short_name%22:%22SkinCare%22,%22description%22:%22Rastreador%20de%20skincare%20e%20peptídeos%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%23ffffff%22,%22theme_color%22:%22%237c3aed%22,%22icons%22:%5B%7B%22src%22:%22data:image/svg+xml,%253Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%20192%20192%27%253E%253Crect%20fill=%27%237c3aed%27%20width=%27192%27%20height=%27192%27/%253E%253Ctext%20x=%2796%27%20y=%27130%27%20font-size=%27120%27%20font-weight=%27bold%27%20fill=%27white%27%20text-anchor=%27middle%27%253E✨%253C/text%253E%253C/svg%253E%22,%22sizes%22:%22192x192%22,%22type%22:%22image/svg+xml%22%7D%5D%7D">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary: #7c3aed;
+            --primary-light: #a78bfa;
+            --primary-dark: #6d28d9;
+            --accent: #ec4899;
+            --success: #10b981;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-900: #111827;
+        }
+
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--gray-50); color: var(--gray-900); }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white; padding: 1rem; position: sticky; top: 0; z-index: 100;
+        }
+
+        .header-content { display: flex; justify-content: space-between; align-items: center; }
+        .header-title { font-size: 1.3rem; font-weight: 700; }
+
+        button { padding: 0.5rem 1rem; border: none; border-radius: 0.5rem; cursor: pointer; font-weight: 500; transition: all 0.2s; }
+        .btn-primary { background: var(--accent); color: white; }
+        .btn-primary:hover { background: #ec5fb8; }
+        .btn-secondary { background: var(--gray-300); color: var(--gray-900); }
+
+        main { display: flex; min-height: calc(100vh - 80px); }
+
+        .sidebar { width: 220px; background: white; border-right: 1px solid var(--gray-200); padding: 1rem 0; overflow-y: auto; }
+        .nav-item { padding: 1rem 1.5rem; cursor: pointer; border-left: 3px solid transparent; transition: all 0.2s; color: var(--gray-600); }
+        .nav-item:hover { background: var(--gray-50); }
+        .nav-item.active { background: var(--primary-light); color: white; border-left-color: var(--primary-dark); }
+
+        .content { flex: 1; padding: 2rem; overflow-y: auto; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .card { background: white; border-radius: 0.75rem; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 1.5rem; }
+        .card-title { font-size: 1.2rem; font-weight: 600; margin-bottom: 1rem; }
+
+        .form-group { margin-bottom: 1.5rem; }
+        label { display: block; font-weight: 500; margin-bottom: 0.5rem; }
+        input, textarea, select { width: 100%; padding: 0.75rem; border: 1px solid var(--gray-300); border-radius: 0.5rem; font-family: inherit; }
+        input:focus, textarea:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1); }
+
+        .produto-preset { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 0.75rem; margin-bottom: 1rem; }
+        .preset-btn { padding: 0.75rem; background: var(--gray-100); border: 2px solid var(--gray-300); border-radius: 0.5rem; cursor: pointer; transition: all 0.2s; text-align: center; font-size: 0.875rem; }
+        .preset-btn:hover { border-color: var(--primary); }
+        .preset-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+        .list-item { display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: var(--gray-50); border-radius: 0.5rem; margin-bottom: 0.75rem; }
+
+        /* Login */
+        .login-container { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); }
+        .login-box { background: white; padding: 2rem; border-radius: 1rem; box-shadow: 0 10px 40px rgba(0,0,0,0.2); width: 100%; max-width: 400px; }
+        .login-title { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .login-subtitle { color: var(--gray-600); margin-bottom: 2rem; }
+        .login-error { background: #fee2e2; border: 1px solid #fca5a5; color: #991b1b; padding: 0.75rem; border-radius: 0.5rem; margin-bottom: 1rem; display: none; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            main { flex-direction: column; }
+            .sidebar { width: 100%; display: flex; overflow-x: auto; border-right: none; border-bottom: 1px solid var(--gray-200); }
+            .nav-item { flex-shrink: 0; border-left: none; border-bottom: 3px solid transparent; }
+            .nav-item.active { border-left: none; border-bottom-color: var(--primary-dark); }
+            .content { padding: 1rem; }
+            .produto-preset { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
+            header { padding: 0.75rem; }
+            .header-title { font-size: 1.1rem; }
+        }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <!-- Login -->
+    <div id="loginScreen" class="login-container">
+        <div class="login-box">
+            <h1 class="login-title">✨ Skincare Tracker</h1>
+            <p class="login-subtitle">Seu rastreador de skincare + GHK-Cu</p>
+            <div id="loginError" class="login-error"></div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="loginEmail" value="danifragat@gmail.com">
+            </div>
+            <div class="form-group">
+                <label>Senha</label>
+                <input type="password" id="loginPassword">
+            </div>
+            <button id="loginBtn" class="btn-primary" style="width: 100%;">Entrar</button>
+        </div>
+    </div>
+
+    <!-- App -->
+    <div id="appScreen" class="hidden">
+        <header>
+            <div class="header-content">
+                <div class="header-title">✨ Skincare Tracker</div>
+                <button id="logoutBtn" class="btn-primary">Sair</button>
+            </div>
+        </header>
+
+        <main>
+            <aside class="sidebar">
+                <div class="nav-item active" onclick="showTab('rotina')">📅 Rotina Diária</div>
+                <div class="nav-item" onclick="showTab('ghkcu')">💊 GHK-Cu</div>
+                <div class="nav-item" onclick="showTab('galeria')">📸 Galeria</div>
+                <div class="nav-item" onclick="showTab('indicadores')">📊 Indicadores</div>
+                <div class="nav-item" onclick="showTab('conhecimento')">📚 Knowledge</div>
+            </aside>
+
+            <div class="content">
+                <!-- ROTINA -->
+                <div id="rotina" class="tab-content active">
+                    <div class="card">
+                        <h2 class="card-title">📅 Rotina Diária</h2>
+                        <div class="form-group">
+                            <label>Data</label>
+                            <input type="date" id="rotinaData">
+                        </div>
+                        <div class="form-group">
+                            <label>Período</label>
+                            <select id="rotinaPeriodo">
+                                <option value="manha">☀️ Manhã</option>
+                                <option value="noite">🌙 Noite</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Selecione produtos utilizados:</label>
+                            <div class="produto-preset">
+                                <button type="button" class="preset-btn" onclick="toggleProduto(this, 'Mix-02')">Principia Mix-02</button>
+                                <button type="button" class="preset-btn" onclick="toggleProduto(this, 'PM-10')">Principia PM-10</button>
+                                <button type="button" class="preset-btn" onclick="toggleProduto(this, 'CM-01')">Principia CM-01</button>
+                                <button type="button" class="preset-btn" onclick="toggleProduto(this, 'Retinol')">Creomy Retinol 0.3%</button>
+                                <button type="button" class="preset-btn" onclick="toggleProduto(this, 'Tônico')">Tônico Sensitive</button>
+                                <button type="button" class="preset-btn" onclick="toggleProduto(this, 'VC-10')">Principia VC-10 ✨</button>
+                                <button type="button" class="preset-btn" onclick="toggleProduto(this, 'AL-10')">Principia AL-10 ✨</button>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Produtos customizados</label>
+                            <input type="text" id="rotinaProdutosCustom" placeholder="Separados por vírgula...">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Observações</label>
+                            <textarea id="rotinaNotas" placeholder="Como a pele reagiu?"></textarea>
+                        </div>
+
+                        <button onclick="salvarRotina()" class="btn-primary">Salvar</button>
+                    </div>
+
+                    <div class="card">
+                        <h2 class="card-title">Histórico</h2>
+                        <div id="rotinasLista"></div>
+                    </div>
+                </div>
+
+                <!-- GHK-Cu -->
+                <div id="ghkcu" class="tab-content">
+                    <div class="card">
+                        <h2 class="card-title">💊 GHK-Cu Tracker</h2>
+                        <div class="form-group">
+                            <label>Data</label>
+                            <input type="date" id="ghkcuData">
+                        </div>
+                        <div class="form-group">
+                            <label>Via de Administração</label>
+                            <select id="ghkcuVia">
+                                <option value="">Selecione...</option>
+                                <option value="injecao">💉 Injeção SC</option>
+                                <option value="topica">🧴 Tópica</option>
+                                <option value="dupla">💊 Dupla (Injeção + Tópica)</option>
+                            </select>
+                        </div>
+
+                        <div id="doseInjecao" class="form-group" style="display:none;">
+                            <label>Dose Injeção (mg)</label>
+                            <input type="number" id="ghkcuDoseInj" step="0.1" placeholder="Ex: 1.0">
+                        </div>
+
+                        <div id="doseTopica" class="form-group" style="display:none;">
+                            <label>Concentração Tópica (%)</label>
+                            <input type="number" id="ghkcuPercent" step="0.1" placeholder="Ex: 1.0">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Local de Aplicação (injeção)</label>
+                            <select id="ghkcuLocal">
+                                <option value="">Selecione...</option>
+                                <option value="abdomen">Abdômen</option>
+                                <option value="coxa">Coxa</option>
+                                <option value="gluteo">Glúteo</option>
+                                <option value="rosto">Rosto (tópica)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Efeitos Observados (0-100)</label>
+                            <input type="number" id="ghkcuEfeitos" min="0" max="100" placeholder="Intensidade de efeitos">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Notas</label>
+                            <textarea id="ghkcuNotas" placeholder="Reações, irritação, brilho, firmeza..."></textarea>
+                        </div>
+
+                        <button onclick="salvarGhkcu()" class="btn-primary">Registrar</button>
+                    </div>
+
+                    <div class="card">
+                        <h2 class="card-title">Histórico GHK-Cu</h2>
+                        <div id="ghkcuLista"></div>
+                    </div>
+                </div>
+
+                <!-- GALERIA -->
+                <div id="galeria" class="tab-content">
+                    <div class="card">
+                        <h2 class="card-title">📸 Galeria de Fotos</h2>
+                        <div class="form-group">
+                            <label>Data</label>
+                            <input type="date" id="fotoData">
+                        </div>
+                        <div class="form-group">
+                            <label>Área</label>
+                            <select id="fotoArea">
+                                <option value="rosto">Rosto</option>
+                                <option value="corpo">Corpo</option>
+                                <option value="maos">Mãos</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Upload</label>
+                            <input type="file" id="fotoUpload" accept="image/*">
+                        </div>
+                        <button onclick="salvarFoto()" class="btn-primary">Salvar Foto</button>
+                    </div>
+                    <div class="card">
+                        <h2 class="card-title">Fotos</h2>
+                        <div id="fotosGaleria"></div>
+                    </div>
+                </div>
+
+                <!-- INDICADORES -->
+                <div id="indicadores" class="tab-content">
+                    <div class="card">
+                        <h2 class="card-title">📊 Indicadores</h2>
+                        <div class="form-group">
+                            <label>Data</label>
+                            <input type="date" id="indData">
+                        </div>
+                        <div class="form-group">
+                            <label>Hidratação (0-100)</label>
+                            <input type="range" id="indHidratacao" min="0" max="100" oninput="updateSlider(this)">
+                            <span id="valHidratacao">50</span>
+                        </div>
+                        <div class="form-group">
+                            <label>Firmeza (0-100)</label>
+                            <input type="range" id="indFirmeza" min="0" max="100" oninput="updateSlider(this)">
+                            <span id="valFirmeza">50</span>
+                        </div>
+                        <div class="form-group">
+                            <label>Brilho (0-100)</label>
+                            <input type="range" id="indBrilho" min="0" max="100" oninput="updateSlider(this)">
+                            <span id="valBrilho">50</span>
+                        </div>
+                        <div class="form-group">
+                            <label>Rugas/Linhas (0-100, menor é melhor)</label>
+                            <input type="range" id="indRugas" min="0" max="100" oninput="updateSlider(this)">
+                            <span id="valRugas">50</span>
+                        </div>
+                        <button onclick="salvarIndicador()" class="btn-primary">Salvar</button>
+                    </div>
+                    <div class="card">
+                        <div id="indicadoresLista"></div>
+                    </div>
+                </div>
+
+                <!-- CONHECIMENTO -->
+                <div id="conhecimento" class="tab-content">
+                    <div class="card">
+                        <h2 class="card-title">📚 Base de Conhecimento</h2>
+                        <div class="form-group">
+                            <label>Título</label>
+                            <input type="text" id="conhTitulo" placeholder="Ex: Retinol - Protocolo">
+                        </div>
+                        <div class="form-group">
+                            <label>Categoria</label>
+                            <select id="conhCategoria">
+                                <option value="ingredientes">🧪 Ingredientes</option>
+                                <option value="peptideos">💊 Peptídeos</option>
+                                <option value="protocolos">📋 Protocolos</option>
+                                <option value="estudos">🔬 Estudos</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Conteúdo</label>
+                            <textarea id="conhConteudo" placeholder="Escreva tudo..."></textarea>
+                        </div>
+                        <button onclick="salvarConhecimento()" class="btn-primary">Salvar</button>
+                    </div>
+                    <div class="card">
+                        <div id="conhecimentoLista"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Firebase (Compat - funciona com file://) -->
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-compat/app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-compat/auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-compat/database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-compat/storage.js"></script>
+
+    <script>
+        // ✅ Credenciais do Firebase já configuradas
+        const firebaseConfig = {
+            apiKey: "AIzaSyCrbmmAnMK_NGEHcYj5ZxF7eOJmSGNDp1s",
+            authDomain: "skincare-traker.firebaseapp.com",
+            databaseURL: "https://skincare-traker.firebaseio.com",
+            projectId: "skincare-traker",
+            storageBucket: "skincare-traker.firebasestorage.app",
+            messagingSenderId: "201395673110",
+            appId: "1:201395673110:web:d827e5e396b1f6806e3d37"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
+        const storage = firebase.storage();
+
+        let currentUser = null;
+        let produtosSelecionados = [];
+
+        // Login
+        document.getElementById('loginBtn').addEventListener('click', async () => {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('appScreen').classList.remove('hidden');
+            } catch (error) {
+                document.getElementById('loginError').textContent = 'Erro: ' + error.message;
+                document.getElementById('loginError').style.display = 'block';
+            }
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            auth.signOut().then(() => {
+                document.getElementById('appScreen').classList.add('hidden');
+                document.getElementById('loginScreen').classList.remove('hidden');
+            });
+        });
+
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                currentUser = user;
+                setDateInputToday();
+                carregarTodos();
+            }
+        });
+
+        function setDateInputToday() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('rotinaData').value = today;
+            document.getElementById('ghkcuData').value = today;
+            document.getElementById('fotoData').value = today;
+            document.getElementById('indData').value = today;
+        }
+
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function toggleProduto(btn, nome) {
+            btn.classList.toggle('active');
+            if (btn.classList.contains('active')) {
+                if (!produtosSelecionados.includes(nome)) produtosSelecionados.push(nome);
+            } else {
+                produtosSelecionados = produtosSelecionados.filter(p => p !== nome);
+            }
+        }
+
+        function updateSlider(input) {
+            const id = input.id.replace('ind', 'val');
+            document.getElementById(id).textContent = input.value;
+        }
+
+        // ROTINA
+        async function salvarRotina() {
+            const data = document.getElementById('rotinaData').value;
+            const periodo = document.getElementById('rotinaPeriodo').value;
+            const custom = document.getElementById('rotinaProdutosCustom').value.split(',').map(p => p.trim()).filter(p => p);
+            const todosProdutos = [...produtosSelecionados, ...custom];
+
+            const rotina = {
+                data: data,
+                periodo: periodo,
+                produtos: todosProdutos,
+                notas: document.getElementById('rotinaNotas').value,
+                timestamp: Date.now()
+            };
+
+            try {
+                await db.ref(`users/${currentUser.uid}/rotina/${data}_${periodo}`).set(rotina);
+                alert('Rotina salva!');
+                document.getElementById('rotinaNotas').value = '';
+                produtosSelecionados = [];
+                document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+                carregarRotinas();
+            } catch (error) {
+                alert('Erro: ' + error.message);
+            }
+        }
+
+        async function carregarRotinas() {
+            const snapshot = await db.ref(`users/${currentUser.uid}/rotina`).once('value');
+            const rotinas = snapshot.val() || {};
+            let html = '';
+            Object.entries(rotinas).reverse().forEach(([key, r]) => {
+                html += `<div class="list-item"><div><strong>${r.data} (${r.periodo})</strong><br><small>${r.produtos.join(', ')}</small></div></div>`;
+            });
+            document.getElementById('rotinasLista').innerHTML = html || '<p>Sem registros</p>';
+        }
+
+        // GHK-Cu
+        document.getElementById('ghkcuVia').addEventListener('change', (e) => {
+            const via = e.target.value;
+            document.getElementById('doseInjecao').style.display = (via.includes('injecao')) ? 'block' : 'none';
+            document.getElementById('doseTopica').style.display = (via.includes('topica')) ? 'block' : 'none';
+        });
+
+        async function salvarGhkcu() {
+            const ghkcu = {
+                data: document.getElementById('ghkcuData').value,
+                via: document.getElementById('ghkcuVia').value,
+                doseInj: document.getElementById('ghkcuDoseInj').value || 0,
+                percent: document.getElementById('ghkcuPercent').value || 0,
+                local: document.getElementById('ghkcuLocal').value,
+                efeitos: document.getElementById('ghkcuEfeitos').value || 0,
+                notas: document.getElementById('ghkcuNotas').value,
+                timestamp: Date.now()
+            };
+
+            try {
+                await db.ref(`users/${currentUser.uid}/ghkcu/${Date.now()}`).set(ghkcu);
+                alert('GHK-Cu registrado!');
+                document.getElementById('ghkcuNotas').value = '';
+                carregarGhkcu();
+            } catch (error) {
+                alert('Erro: ' + error.message);
+            }
+        }
+
+        async function carregarGhkcu() {
+            const snapshot = await db.ref(`users/${currentUser.uid}/ghkcu`).once('value');
+            const items = snapshot.val() || {};
+            let html = '';
+            Object.entries(items).reverse().slice(0, 10).forEach(([key, item]) => {
+                html += `<div class="list-item"><div><strong>${item.data}</strong><br><small>${item.via} • Dose: ${item.doseInj || item.percent} • Efeitos: ${item.efeitos}%</small></div></div>`;
+            });
+            document.getElementById('ghkcuLista').innerHTML = html || '<p>Sem registros</p>';
+        }
+
+        // FOTO
+        async function salvarFoto() {
+            const file = document.getElementById('fotoUpload').files[0];
+            if (!file) { alert('Selecione uma foto'); return; }
+
+            try {
+                const ref = storage.ref(`users/${currentUser.uid}/fotos/${Date.now()}_${file.name}`);
+                const snapshot = await ref.put(file);
+                const url = await snapshot.ref.getDownloadURL();
+
+                const fotoData = {
+                    data: document.getElementById('fotoData').value,
+                    area: document.getElementById('fotoArea').value,
+                    url: url,
+                    timestamp: Date.now()
+                };
+
+                await db.ref(`users/${currentUser.uid}/fotos/${Date.now()}`).set(fotoData);
+                alert('Foto salva!');
+                document.getElementById('fotoUpload').value = '';
+                carregarFotos();
+            } catch (error) {
+                alert('Erro: ' + error.message);
+            }
+        }
+
+        async function carregarFotos() {
+            const snapshot = await db.ref(`users/${currentUser.uid}/fotos`).once('value');
+            const fotos = snapshot.val() || {};
+            let html = '<div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(120px, 1fr)); gap:0.75rem;">';
+            Object.entries(fotos).reverse().forEach(([key, foto]) => {
+                html += `<img src="${foto.url}" style="width:100%; height:120px; object-fit:cover; border-radius:0.5rem;">`;
+            });
+            html += '</div>';
+            document.getElementById('fotosGaleria').innerHTML = html || '<p>Sem fotos</p>';
+        }
+
+        // INDICADORES
+        async function salvarIndicador() {
+            const ind = {
+                data: document.getElementById('indData').value,
+                hidratacao: document.getElementById('indHidratacao').value,
+                firmeza: document.getElementById('indFirmeza').value,
+                brilho: document.getElementById('indBrilho').value,
+                rugas: document.getElementById('indRugas').value,
+                timestamp: Date.now()
+            };
+
+            try {
+                await db.ref(`users/${currentUser.uid}/indicadores/${ind.data}`).set(ind);
+                alert('Indicadores salvos!');
+                carregarIndicadores();
+            } catch (error) {
+                alert('Erro: ' + error.message);
+            }
+        }
+
+        async function carregarIndicadores() {
+            const snapshot = await db.ref(`users/${currentUser.uid}/indicadores`).once('value');
+            const items = snapshot.val() || {};
+            let html = '';
+            Object.entries(items).reverse().slice(0, 5).forEach(([key, item]) => {
+                html += `<div class="list-item"><div><strong>${item.data}</strong><br><small>Hidratação: ${item.hidratacao} | Firmeza: ${item.firmeza} | Brilho: ${item.brilho}</small></div></div>`;
+            });
+            document.getElementById('indicadoresLista').innerHTML = html || '<p>Sem registros</p>';
+        }
+
+        // CONHECIMENTO
+        async function salvarConhecimento() {
+            const conh = {
+                titulo: document.getElementById('conhTitulo').value,
+                categoria: document.getElementById('conhCategoria').value,
+                conteudo: document.getElementById('conhConteudo').value,
+                timestamp: Date.now()
+            };
+
+            try {
+                await db.ref(`users/${currentUser.uid}/conhecimento/${Date.now()}`).set(conh);
+                alert('Nota salva!');
+                document.getElementById('conhTitulo').value = '';
+                document.getElementById('conhConteudo').value = '';
+                carregarConhecimento();
+            } catch (error) {
+                alert('Erro: ' + error.message);
+            }
+        }
+
+        async function carregarConhecimento() {
+            const snapshot = await db.ref(`users/${currentUser.uid}/conhecimento`).once('value');
+            const items = snapshot.val() || {};
+            let html = '';
+            Object.entries(items).reverse().forEach(([key, item]) => {
+                html += `<div class="card"><strong>${item.titulo}</strong> <small>(${item.categoria})</small><p>${item.conteudo.substring(0, 100)}...</p></div>`;
+            });
+            document.getElementById('conhecimentoLista').innerHTML = html || '<p>Sem notas</p>';
+        }
+
+        async function carregarTodos() {
+            setTimeout(() => {
+                carregarRotinas();
+                carregarGhkcu();
+                carregarFotos();
+                carregarIndicadores();
+                carregarConhecimento();
+            }, 500);
+        }
+
+        document.getElementById('loginPassword')?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') document.getElementById('loginBtn').click();
+        });
+    </script>
+</body>
+</html>

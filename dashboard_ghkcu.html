@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Dashboard especializado para GHK-Cu">
+    <meta name="theme-color" content="#dc2626">
+    <title>GHK-Cu Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary: #dc2626;
+            --primary-light: #ef4444;
+            --dark: #1f2937;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-600: #4b5563;
+            --success: #10b981;
+            --warning: #f59e0b;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+            color: white;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, #b91c1c 100%);
+            padding: 2rem;
+            text-align: center;
+            border-bottom: 3px solid var(--warning);
+        }
+
+        .header-title { font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .header-subtitle { font-size: 0.9rem; opacity: 0.9; }
+
+        /* Container */
+        .container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 0.75rem 1.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 2px solid transparent;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .tab-btn:hover { background: rgba(255, 255, 255, 0.2); }
+        .tab-btn.active { background: var(--primary); border-color: var(--warning); }
+
+        /* Content */
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Cards */
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .card:hover { background: rgba(255, 255, 255, 0.08); }
+
+        .card-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem; }
+
+        /* Grid */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+
+        /* Stats */
+        .stat-box {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(220, 38, 38, 0.2) 100%);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .stat-value { font-size: 2.5rem; font-weight: 700; color: #fca5a5; margin: 0.5rem 0; }
+        .stat-label { font-size: 0.9rem; opacity: 0.8; }
+
+        /* Form */
+        .form-group { margin-bottom: 1.5rem; }
+        label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
+        input, select, textarea { width: 100%; padding: 0.75rem; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 0.5rem; color: white; font-family: inherit; }
+        input::placeholder, textarea::placeholder { color: rgba(255, 255, 255, 0.5); }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2); }
+
+        button {
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        button:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(220, 38, 38, 0.3); }
+
+        /* Chart Container */
+        .chart-container { position: relative; height: 300px; margin-bottom: 2rem; }
+
+        /* Timeline */
+        .timeline { margin-top: 2rem; }
+        .timeline-item {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+            padding-left: 1rem;
+            border-left: 3px solid var(--primary);
+        }
+
+        .timeline-date { font-weight: 600; color: var(--warning); min-width: 100px; }
+        .timeline-content { flex: 1; }
+
+        /* Calculator */
+        .calc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-top: 1rem; }
+
+        .calc-result {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.2) 100%);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .result-value { font-size: 2rem; font-weight: 700; color: #86efac; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            header { padding: 1rem; }
+            .header-title { font-size: 1.5rem; }
+            .container { padding: 1rem; }
+            .tabs { flex-direction: column; }
+            .grid { grid-template-columns: 1fr; }
+        }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <h1 class="header-title">💊 GHK-Cu Dashboard</h1>
+        <p class="header-subtitle">Análise aprofundada de ciclos, dosagens e evolução</p>
+    </header>
+
+    <div class="container">
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="showTab('overview')">📊 Overview</button>
+            <button class="tab-btn" onclick="showTab('ciclos')">🔄 Ciclos</button>
+            <button class="tab-btn" onclick="showTab('calculator')">🧮 Calculadora</button>
+            <button class="tab-btn" onclick="showTab('protocolo')">📋 Protocolo</button>
+            <button class="tab-btn" onclick="showTab('estudos')">🔬 Estudos</button>
+        </div>
+
+        <!-- OVERVIEW -->
+        <div id="overview" class="tab-content active">
+            <div class="grid">
+                <div class="stat-box">
+                    <div class="stat-label">Ciclos Completados</div>
+                    <div class="stat-value" id="ciclosCompletos">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Dias Atuais ON</div>
+                    <div class="stat-value" id="diasOn">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Dose Total Acumulada</div>
+                    <div class="stat-value" id="doseTotal">0mg</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Efeito Médio Observado</div>
+                    <div class="stat-value" id="efetoMedio">0%</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">📈 Evolução de Efeitos</h2>
+                <div class="chart-container">
+                    <canvas id="chartEfeitos"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">⏱️ Timeline</h2>
+                <div class="timeline" id="timelineOverview"></div>
+            </div>
+        </div>
+
+        <!-- CICLOS -->
+        <div id="ciclos" class="tab-content">
+            <div class="card">
+                <h2 class="card-title">🔄 Gerenciador de Ciclos</h2>
+
+                <div class="form-group">
+                    <label>Data Início Ciclo ON</label>
+                    <input type="date" id="cicloDataInicio">
+                </div>
+
+                <div class="form-group">
+                    <label>Duração do Ciclo ON (dias)</label>
+                    <input type="number" id="cicloDuracao" value="30">
+                </div>
+
+                <div class="form-group">
+                    <label>Protocolo</label>
+                    <select id="cicloDose">
+                        <option value="iniciante">🟢 Iniciante (1mg/dia)</option>
+                        <option value="padrao">🟡 Padrão (1.5mg/dia)</option>
+                        <option value="avancado">🔴 Avançado (2mg/dia)</option>
+                    </select>
+                </div>
+
+                <button onclick="salvarCiclo()">Iniciar Ciclo</button>
+
+                <div class="timeline" id="ciclTmeline" style="margin-top: 2rem;"></div>
+            </div>
+        </div>
+
+        <!-- CALCULATOR -->
+        <div id="calculator" class="tab-content">
+            <div class="card">
+                <h2 class="card-title">🧮 Calculadora de Reconstitução</h2>
+
+                <div style="background: rgba(249, 115, 22, 0.1); border: 1px solid rgba(249, 115, 22, 0.3); border-radius: 0.75rem; padding: 1rem; margin-bottom: 1.5rem;">
+                    <p><strong>⚠️ Padrão Típico:</strong> Vial 50mg com 2-3mL de água bacteriostática</p>
+                    <p style="margin-top: 0.5rem;">Resultado: ~10mg/mL (concentração comum)</p>
+                </div>
+
+                <div class="form-group">
+                    <label>Quantidade no Vial (mg)</label>
+                    <input type="number" id="calcVial" value="50" oninput="calcularReconstitucao()">
+                </div>
+
+                <div class="form-group">
+                    <label>Volume de Água Bacteriostática (mL)</label>
+                    <input type="number" id="calcAgua" value="2.5" step="0.1" oninput="calcularReconstitucao()">
+                </div>
+
+                <div class="calc-grid">
+                    <div class="calc-result">
+                        <div class="stat-label">Concentração Final</div>
+                        <div class="result-value" id="resultConc">0 mg/mL</div>
+                    </div>
+                    <div class="calc-result">
+                        <div class="stat-label">1mg = </div>
+                        <div class="result-value" id="resultVolume">0 mL</div>
+                    </div>
+                    <div class="calc-result">
+                        <div class="stat-label">2mg = </div>
+                        <div class="result-value" id="resultVolume2">0 mL</div>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-top: 2rem;">
+                    <label>Dose Desejada (mg)</label>
+                    <input type="number" id="calcDose" value="1" step="0.1" oninput="calcularDose()">
+                </div>
+
+                <div class="calc-result">
+                    <div class="stat-label">Volume a Injetar</div>
+                    <div class="result-value" id="resultFinal">0 mL</div>
+                    <p style="margin-top: 1rem; font-size: 0.9rem;">Use seringa de insulina (100 IU) para precisão</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- PROTOCOLO -->
+        <div id="protocolo" class="tab-content">
+            <div class="card">
+                <h2 class="card-title">📋 Protocolo GHK-Cu (Sua Referência)</h2>
+
+                <div style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(37, 99, 235, 0.2) 100%); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 0.75rem; padding: 1.5rem; margin-bottom: 2rem;">
+                    <h3 style="margin-bottom: 1rem;">💉 Via Injeção (Seu Protocolo)</h3>
+                    <ul style="list-style: none; line-height: 1.8;">
+                        <li>✅ <strong>Forma:</strong> GHK-Cu 50mg injetável (OnlyPharma Premium)</li>
+                        <li>✅ <strong>Reconstitução:</strong> 50mg + 2.5mL água bacteriostática = 20mg/mL</li>
+                        <li>✅ <strong>Dose Padrão:</strong> 1.0-2.0mg/dia</li>
+                        <li>✅ <strong>Aplicação:</strong> SC (subcutânea) - Abdômen, Coxa ou Glúteo</li>
+                        <li>✅ <strong>Profundidade:</strong> 4-6mm em ângulo 45°</li>
+                        <li>✅ <strong>Agulha:</strong> 31G ou 32G (como protocolo de insulina)</li>
+                        <li>✅ <strong>Ciclo:</strong> 30 dias ON / 30 dias OFF (essencial para evitar dessensibilização)</li>
+                        <li>✅ <strong>Armazenamento:</strong> Refrigerado após reconstituição</li>
+                    </ul>
+                </div>
+
+                <div style="background: linear-gradient(135deg, rgba(34, 197, 94, 0.2) 0%, rgba(22, 163, 74, 0.2) 100%); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 0.75rem; padding: 1.5rem; margin-bottom: 2rem;">
+                    <h3 style="margin-bottom: 1rem;">🧴 Via Tópica (Sinergia)</h3>
+                    <ul style="list-style: none; line-height: 1.8;">
+                        <li>✅ <strong>Concentração:</strong> 1-5% em sérum ou creme</li>
+                        <li>✅ <strong>Quantidade:</strong> Pérola (tamanho ervilha) ou 2-3 gotas</li>
+                        <li>✅ <strong>Frequência:</strong> 1-2x/dia (manhã e noite)</li>
+                        <li>✅ <strong>Aplicação:</strong> Pele limpa, antes do hidratante</li>
+                        <li>✅ <strong>Resultado:</strong> 2-4 semanas de uso consistente</li>
+                        <li>✅ <strong>Compatibilidade:</strong> Aguarde 30min se usar Vitamina C pura</li>
+                    </ul>
+                </div>
+
+                <div style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(217, 119, 6, 0.2) 100%); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 0.75rem; padding: 1.5rem;">
+                    <h3 style="margin-bottom: 1rem;">⚠️ Monitoramento Crítico</h3>
+                    <ul style="list-style: none; line-height: 1.8;">
+                        <li>📸 Tirar foto baseline antes de começar (protocolo padronizado)</li>
+                        <li>📋 Documentar CADA aplicação: data, dose, local, observações</li>
+                        <li>📊 Fotos a cada 2 semanas (mesma luz, ângulo, hora)</li>
+                        <li>✅ Respeitar ciclos: 30 ON / 30 OFF é ESSENCIAL</li>
+                        <li>⚠️ Se irritação persistir, reduzir dose ou pausar</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- ESTUDOS -->
+        <div id="estudos" class="tab-content">
+            <div class="card">
+                <h2 class="card-title">🔬 Base Científica: Estudos Referenciais</h2>
+
+                <div style="background: rgba(255, 255, 255, 0.05); border-left: 4px solid #10b981; border-radius: 0.5rem; padding: 1.5rem; margin-bottom: 1rem;">
+                    <h4 style="color: #86efac; margin-bottom: 0.5rem;">Abdulghani et al. (1999)</h4>
+                    <p><strong>Resultado:</strong> GHK-Cu superou Vitamina C e Ácido Retinóico</p>
+                    <p>70% dos voluntários tiveram aumento significativo em síntese de colágeno</p>
+                </div>
+
+                <div style="background: rgba(255, 255, 255, 0.05); border-left: 4px solid #10b981; border-radius: 0.5rem; padding: 1.5rem; margin-bottom: 1rem;">
+                    <h4 style="color: #86efac; margin-bottom: 0.5rem;">Krüger et al. (Clinical Studies)</h4>
+                    <p><strong>Resultado:</strong> Aumento em espessura da pele (epiderme + derme)</p>
+                    <p>Melhora em hidratação, suavização visível, aumento de colágeno I</p>
+                </div>
+
+                <div style="background: rgba(255, 255, 255, 0.05); border-left: 4px solid #10b981; border-radius: 0.5rem; padding: 1.5rem; margin-bottom: 1rem;">
+                    <h4 style="color: #86efac; margin-bottom: 0.5rem;">Pickart (1973)</h4>
+                    <p><strong>Descoberta:</strong> Primeiro isolamento de GHK do plasma humano</p>
+                    <p>Mais de 60 estudos publicados desde então sobre regeneração de tecidos</p>
+                </div>
+
+                <div style="background: rgba(255, 255, 255, 0.05); border-left: 4px solid #10b981; border-radius: 0.5rem; padding: 1.5rem;">
+                    <h4 style="color: #86efac; margin-bottom: 0.5rem;">In Vitro Studies</h4>
+                    <p><strong>Resultado:</strong> GHK-Cu (0.01-100 nM) aumentou produção de elastina e colágeno</p>
+                    <p>Efeito documentado em fibroblastos humanos adultos</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">🎯 Mecanismo de Ação</h2>
+                <div style="line-height: 2;">
+                    <p>🧬 <strong>Estimulação de Fibroblastos:</strong> Ativa células produtoras de colágeno (até 70% aumento em lab)</p>
+                    <p>🔄 <strong>Remodelação da Matriz:</strong> Induz elastina e glicosaminoglicanos</p>
+                    <p>🛡️ <strong>Anti-inflamação:</strong> Modula citocinas, reduz TNF-α e IL-6</p>
+                    <p>⚡ <strong>Cicatrização:</strong> Acelera reparação de feridas, atrai células imunes</p>
+                    <p>🧬 <strong>Nível Genético:</strong> Influencia centenas de genes de regeneração</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let chartEfeitos = null;
+
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+
+            if (tabName === 'overview' && !chartEfeitos) {
+                criarGrafico();
+            }
+        }
+
+        function criarGrafico() {
+            const ctx = document.getElementById('chartEfeitos').getContext('2d');
+            chartEfeitos = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Semana 1', 'Semana 2', 'Semana 3', 'Semana 4', 'Semana 5', 'Semana 6'],
+                    datasets: [{
+                        label: 'Efeito Observado (%)',
+                        data: [10, 25, 45, 65, 75, 85],
+                        borderColor: '#ef4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 6,
+                        pointBackgroundColor: '#dc2626',
+                        pointBorderColor: '#f87171',
+                        pointBorderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { labels: { color: 'white' } }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: { color: 'rgba(255, 255, 255, 0.7)' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        x: {
+                            ticks: { color: 'rgba(255, 255, 255, 0.7)' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function calcularReconstitucao() {
+            const vial = parseFloat(document.getElementById('calcVial').value);
+            const agua = parseFloat(document.getElementById('calcAgua').value);
+            const conc = (vial / agua).toFixed(2);
+            const vol1 = (1 / conc).toFixed(3);
+            const vol2 = (2 / conc).toFixed(3);
+
+            document.getElementById('resultConc').textContent = conc + ' mg/mL';
+            document.getElementById('resultVolume').textContent = vol1 + ' mL';
+            document.getElementById('resultVolume2').textContent = vol2 + ' mL';
+        }
+
+        function calcularDose() {
+            const vial = parseFloat(document.getElementById('calcVial').value);
+            const agua = parseFloat(document.getElementById('calcAgua').value);
+            const dose = parseFloat(document.getElementById('calcDose').value);
+            const conc = vial / agua;
+            const volume = (dose / conc).toFixed(3);
+
+            document.getElementById('resultFinal').textContent = volume + ' mL';
+        }
+
+        function salvarCiclo() {
+            const data = document.getElementById('cicloDataInicio').value;
+            const duracao = document.getElementById('cicloDuracao').value;
+            const protocolo = document.getElementById('cicloDose').value;
+
+            alert(`Ciclo iniciado em ${data} (${duracao} dias) - ${protocolo}`);
+
+            const html = `
+                <div class="timeline-item">
+                    <div class="timeline-date">${data}</div>
+                    <div class="timeline-content">
+                        <strong>Ciclo ${protocolo}</strong>
+                        <p style="font-size: 0.9rem; margin-top: 0.5rem;">Duração: ${duracao} dias • Pausa: 30 dias após conclusão</p>
+                    </div>
+                </div>
+            `;
+            document.getElementById('ciclTmeline').innerHTML = html;
+        }
+
+        // Calcular na carga
+        calcularReconstitucao();
+    </script>
+</body>
+</html>
