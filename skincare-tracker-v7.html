@@ -624,54 +624,103 @@
             </div>
         </div>
 
-        <!-- PÁGINA 3: CALCULADORA DE DOSES -->
+        <!-- PÁGINA 3: CALCULADORA DE RECONSTITUÇÃO -->
         <div class="page" id="paginaCalculadora">
             <div class="container">
-                <div class="date-display">Calculadora de Doses de Peptídeos</div>
+                <div class="date-display">Calculadora de Reconstituição de Peptídeos</div>
 
                 <div class="card">
-                    <div class="card-title">🧮 Calcular Dose</div>
+                    <div class="card-title">🧮 Calcular Reconstitução</div>
 
                     <div class="peptideo-form">
+                        <!-- Peptide Selection -->
+                        <div class="form-group">
+                            <label for="calcPeptideo">1. Qual peptídeo?</label>
+                            <select id="calcPeptideo" onchange="atualizarCalculadora()">
+                                <option value="ghk-cu">GHK-Cu (Peptídeo de Cobre)</option>
+                                <option value="bpc157">BPC-157</option>
+                                <option value="tb500">TB-500</option>
+                                <option value="semaglutida">Semaglutida</option>
+                                <option value="tirzepatida">Tirzepatida</option>
+                                <option value="outro">Outro</option>
+                            </select>
+                        </div>
+
                         <div class="calculadora-inputs">
+                            <!-- Vial Content -->
                             <div class="form-group">
-                                <label for="peso">Seu Peso (kg)</label>
-                                <input type="number" id="peso" placeholder="Ex: 70" step="0.1">
+                                <label for="conteudoFrasco">2. Quantidade no frasco (mg)</label>
+                                <input type="number" id="conteudoFrasco" placeholder="Ex: 5" step="0.1" min="0" onchange="atualizarCalculadora()" oninput="atualizarCalculadora()">
                             </div>
+
+                            <!-- Bacteriostatic Water -->
                             <div class="form-group">
-                                <label for="frecuencia">Frequência de Uso</label>
-                                <select id="frecuencia">
-                                    <option value="conservadora">Conservadora (0,04 mg/kg/semana)</option>
-                                    <option value="moderada">Moderada (0,06 mg/kg/semana)</option>
-                                    <option value="agressiva">Agressiva (0,1 mg/kg/semana)</option>
-                                </select>
+                                <label for="volumeAgua">3. Água bacteriostática (ml)</label>
+                                <input type="number" id="volumeAgua" placeholder="Ex: 2" step="0.1" min="0" onchange="atualizarCalculadora()" oninput="atualizarCalculadora()">
                             </div>
                         </div>
 
-                        <button class="btn-primary" onclick="calcularDose()">Calcular</button>
+                        <!-- Dose per injection -->
+                        <div class="form-group">
+                            <label for="dosePorInjecao">4. Dose desejada (mg)</label>
+                            <input type="number" id="dosePorInjecao" placeholder="Ex: 1" step="0.1" min="0" onchange="atualizarCalculadora()" oninput="atualizarCalculadora()">
+                        </div>
+
+                        <!-- Syringe Size -->
+                        <div class="form-group">
+                            <label>5. Tamanho da seringa</label>
+                            <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem; flex-wrap: wrap;">
+                                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; flex: 1; min-width: 120px;">
+                                    <input type="radio" name="tamanhoSeringa" value="30" onchange="atualizarCalculadora()" style="cursor: pointer;">
+                                    30 U (0,3 ml)
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; flex: 1; min-width: 120px;">
+                                    <input type="radio" name="tamanhoSeringa" value="50" checked onchange="atualizarCalculadora()" style="cursor: pointer;">
+                                    50 U (0,5 ml)
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; flex: 1; min-width: 120px;">
+                                    <input type="radio" name="tamanhoSeringa" value="100" onchange="atualizarCalculadora()" style="cursor: pointer;">
+                                    100 U (1 ml)
+                                </label>
+                            </div>
+                        </div>
                     </div>
 
-                    <div id="resultadoCalc" style="display: none;">
+                    <!-- Results -->
+                    <div id="resultadoCalc" style="display: none; margin-top: 2rem;">
                         <div class="resultado">
-                            <div class="resultado-valor" id="doseRecomendada">0 mg</div>
-                            <div class="resultado-label" id="labelDose">Dose recomendada por semana</div>
+                            <div class="resultado-valor" id="unidadesAPuxar">—</div>
+                            <div class="resultado-label" id="labelUnidades">Unidades a puxar na seringa</div>
                         </div>
 
-                        <div style="background: var(--gray-50); padding: 1rem; border-radius: 0.5rem; margin-top: 1rem; line-height: 1.8;">
-                            <p><strong>Sugestão de parcelamento:</strong></p>
-                            <p id="parcelamento" style="margin-top: 0.5rem; color: var(--primary);"></p>
-                            <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--gray-600);">Consulte sempre um profissional antes de usar qualquer peptídeo. Esta é apenas uma sugestão educacional.</p>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.5rem;">
+                            <div style="background: var(--gray-50); padding: 1rem; border-radius: 0.5rem; border-left: 4px solid var(--primary);">
+                                <div style="font-size: 0.85rem; color: var(--gray-600); margin-bottom: 0.25rem;">Concentração</div>
+                                <div style="font-size: 1.3rem; font-weight: 700; color: var(--primary);" id="concentracao">— mg/ml</div>
+                            </div>
+                            <div style="background: var(--gray-50); padding: 1rem; border-radius: 0.5rem; border-left: 4px solid var(--success);">
+                                <div style="font-size: 0.85rem; color: var(--gray-600); margin-bottom: 0.25rem;">Doses por frasco</div>
+                                <div style="font-size: 1.3rem; font-weight: 700; color: var(--success);" id="dosesFreco">—</div>
+                            </div>
+                        </div>
+
+                        <div id="alertaSeringa" style="display: none; background: var(--warning); color: white; padding: 1rem; border-radius: 0.5rem; margin-top: 1rem; text-align: center; font-weight: 600;">
+                            ⚠️ Atenção: Dose ultrapassa a capacidade da seringa!
+                        </div>
+
+                        <div style="background: var(--gray-50); padding: 1rem; border-radius: 0.5rem; margin-top: 1rem; line-height: 1.8; font-size: 0.9rem; color: var(--gray-600);">
+                            <p>⚠️ Conteúdo informativo — não substitui orientação médica. Dosagem, indicações e contraindicações variam por pessoa. Consulte sempre um profissional.</p>
                         </div>
                     </div>
                 </div>
 
                 <div class="card">
-                    <div class="card-title">📚 Guia de Dosagem</div>
-                    <div style="line-height: 1.8; color: var(--gray-700);">
-                        <p><strong>Conservadora:</strong> Ideal para iniciantes. 0,04 mg/kg/semana</p>
-                        <p><strong>Moderada:</strong> Para quem já usa. 0,06 mg/kg/semana</p>
-                        <p><strong>Agressiva:</strong> Máxima recomendada. 0,1 mg/kg/semana</p>
-                        <p style="margin-top: 1rem; font-size: 0.9rem;">⚠️ Sempre consulte um médico especialista antes de iniciar qualquer protocolo de peptídeos.</p>
+                    <div class="card-title">📚 Como Funciona</div>
+                    <div style="line-height: 1.8; color: var(--gray-700); font-size: 0.95rem;">
+                        <p><strong>Concentração:</strong> É calculada dividindo a quantidade de peptídeo (mg) pelo volume de água (ml). Mais água = menor concentração.</p>
+                        <p style="margin-top: 1rem;"><strong>Unidades (U):</strong> Em seringas de insulina, 1 ml = 100 unidades. A calculadora converte a dose desejada em unidades para sua seringa.</p>
+                        <p style="margin-top: 1rem;"><strong>Fórmula:</strong> Unidades = (Dose desejada ÷ Concentração) × 100</p>
+                        <p style="margin-top: 1rem;"><strong>Aviso 50U:</strong> A maioria das seringas tem limite de 30-100 unidades. Se ultrapassar, considere usar água diferente ou ajustar a dose.</p>
                     </div>
                 </div>
             </div>
@@ -990,32 +1039,45 @@
             }
         };
 
-        // Calculadora
-        window.calcularDose = function() {
-            const peso = parseFloat(document.getElementById('peso').value);
-            const frecuencia = document.getElementById('frecuencia').value;
+        // Calculadora de Reconstitução
+        window.atualizarCalculadora = function() {
+            const conteudoFrasco = parseFloat(document.getElementById('conteudoFrasco').value);
+            const volumeAgua = parseFloat(document.getElementById('volumeAgua').value);
+            const dosePorInjecao = parseFloat(document.getElementById('dosePorInjecao').value);
+            const tamanhoSeringa = document.querySelector('input[name="tamanhoSeringa"]:checked').value;
 
-            if (!peso) {
-                alert('Preencha seu peso');
+            // Check if all required fields are filled
+            if (!conteudoFrasco || !volumeAgua || !dosePorInjecao) {
+                document.getElementById('resultadoCalc').style.display = 'none';
                 return;
             }
 
-            const taxas = {
-                conservadora: 0.04,
-                moderada: 0.06,
-                agressiva: 0.1
-            };
+            // Calculate concentration (mg/ml)
+            const concentracao = conteudoFrasco / volumeAgua;
 
-            const taxa = taxas[frecuencia];
-            const doseUnica = (peso * taxa / 2).toFixed(2); // Para 2x por semana
-            const doseSemanal = (peso * taxa).toFixed(2);
+            // Calculate units to pull (1 ml = 100 U)
+            const unidadesAPuxar = Math.round((dosePorInjecao / concentracao) * 100);
 
-            document.getElementById('doseRecomendada').textContent = doseSemanal + ' mg';
-            document.getElementById('labelDose').textContent = 'Dose recomendada por semana';
-            document.getElementById('parcelamento').innerHTML = `
-                <strong>${doseUnica}mg × 2 vezes/semana</strong> ou<br/>
-                <strong>${(doseSemanal / 3).toFixed(2)}mg × 3 vezes/semana</strong>
-            `;
+            // Calculate doses per vial
+            const dosesFreco = Math.round((conteudoFrasco / dosePorInjecao) * 10) / 10;
+
+            // Get syringe size
+            const tamanhoEmUnidades = parseInt(tamanhoSeringa);
+
+            // Update results
+            document.getElementById('unidadesAPuxar').textContent = unidadesAPuxar + ' U';
+            document.getElementById('concentracao').textContent = concentracao.toFixed(2) + ' mg/ml';
+            document.getElementById('dosesFreco').textContent = dosesFreco;
+
+            // Show warning if exceeds syringe capacity
+            const alertaSeringa = document.getElementById('alertaSeringa');
+            if (unidadesAPuxar > tamanhoEmUnidades) {
+                alertaSeringa.style.display = 'block';
+            } else {
+                alertaSeringa.style.display = 'none';
+            }
+
+            // Show results
             document.getElementById('resultadoCalc').style.display = 'block';
         };
 
