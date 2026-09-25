@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Rastreador de skincare + GHK-Cu">
+    <meta name="theme-color" content="#7c3aed">
+    <title>Skincare Tracker</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary: #7c3aed;
+            --primary-light: #a78bfa;
+            --primary-dark: #6d28d9;
+            --accent: #ec4899;
+            --success: #10b981;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-900: #111827;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--gray-50);
+            color: var(--gray-900);
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        button {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #ec5fb8;
+        }
+
+        /* Login Screen */
+        .login-screen {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            padding: 1rem;
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .login-card h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            color: var(--gray-900);
+        }
+
+        .login-card p {
+            color: var(--gray-600);
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--gray-700);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--gray-300);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn-login:hover:not(:disabled) {
+            background: #ec5fb8;
+        }
+
+        .btn-login:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .error {
+            color: #dc2626;
+            background: #fee2e2;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            display: none;
+            border-left: 4px solid #dc2626;
+        }
+
+        .error.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        .success {
+            color: #059669;
+            background: #d1fae5;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            display: none;
+            border-left: 4px solid #059669;
+        }
+
+        .success.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .app-screen {
+            display: none;
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .app-screen.show {
+            display: block;
+        }
+
+        .welcome {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .welcome h1 {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .logout-btn {
+            background: #dc2626;
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+        }
+
+        .logout-btn:hover {
+            background: #b91c1c;
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+            animation: pulse 2s infinite;
+        }
+
+        .status-dot.success {
+            background: var(--success);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 0.5rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- LOGIN SCREEN -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-card">
+            <h1>✨ Skincare Tracker</h1>
+            <p>Seu rastreador de skincare + GHK-Cu</p>
+
+            <div class="error" id="errorMsg"></div>
+            <div class="success" id="successMsg"></div>
+
+            <form onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input
+                        type="email"
+                        id="loginEmail"
+                        value="danifragat@gmail.com"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="loginPassword">Senha</label>
+                    <input
+                        type="password"
+                        id="loginPassword"
+                        placeholder="Mínimo 6 caracteres"
+                        required
+                    >
+                </div>
+
+                <button type="submit" class="btn-login" id="loginBtn">
+                    Entrar
+                </button>
+            </form>
+
+            <p style="text-align: center; margin-top: 1rem; color: var(--gray-600); font-size: 0.9rem;">
+                Não tem conta? Será criada automaticamente ao entrar.
+            </p>
+        </div>
+    </div>
+
+    <!-- APP SCREEN -->
+    <div class="app-screen" id="appScreen">
+        <header>
+            <div class="header-content">
+                <div class="header-title">🌟 Skincare Tracker</div>
+                <button class="btn-primary logout-btn" onclick="handleLogout()">Sair</button>
+            </div>
+        </header>
+
+        <div class="welcome">
+            <h1>Bem-vindo! 👋</h1>
+            <p id="userEmail"></p>
+            <p style="margin-top: 1rem; color: var(--gray-600);">
+                <span class="status-dot success"></span>
+                Você está logado com sucesso! ✅
+            </p>
+        </div>
+    </div>
+
+    <!-- Firebase SDK v9+ (modular) -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js';
+        import {
+            getAuth,
+            signInWithEmailAndPassword,
+            createUserWithEmailAndPassword,
+            signOut,
+            onAuthStateChanged
+        } from 'https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCrbmmAnMK_NGEHcYj5ZxF7eOJmSGNDp1s",
+            authDomain: "skincare-traker.firebaseapp.com",
+            databaseURL: "https://skincare-traker.firebaseio.com",
+            projectId: "skincare-traker",
+            storageBucket: "skincare-traker.firebasestorage.app",
+            messagingSenderId: "201395673110",
+            appId: "1:201395673110:web:d827e5e396b1f6806e3d37"
+        };
+
+        // Initialize Firebase
+        let app, auth;
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            console.log('✅ Firebase inicializado com sucesso');
+        } catch (error) {
+            console.error('❌ Erro ao inicializar Firebase:', error);
+        }
+
+        // Elements
+        const loginScreen = document.getElementById('loginScreen');
+        const appScreen = document.getElementById('appScreen');
+        const loginBtn = document.getElementById('loginBtn');
+        const errorMsg = document.getElementById('errorMsg');
+        const successMsg = document.getElementById('successMsg');
+        const userEmail = document.getElementById('userEmail');
+
+        // Handle Login Form
+        window.handleLogin = async (event) => {
+            event.preventDefault();
+
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            // Clear messages
+            errorMsg.classList.remove('show');
+            successMsg.classList.remove('show');
+
+            // Disable button and show loading
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = '<span class="loading-spinner"></span>Entrando...';
+
+            console.log(`🔄 Tentando login com: ${email}`);
+
+            try {
+                // Try to sign in
+                console.log('📝 Chamando signInWithEmailAndPassword...');
+                const result = await signInWithEmailAndPassword(auth, email, password);
+                console.log('✅ Login bem-sucedido:', result.user.uid);
+                showSuccess('Login realizado! Carregando...');
+
+            } catch (error) {
+                console.log('❌ Erro no sign in:', error.code, error.message);
+
+                // If sign in fails, try to create account
+                if (error.code === 'auth/user-not-found') {
+                    console.log('👤 Usuário não encontrado, tentando criar conta...');
+                    try {
+                        const result = await createUserWithEmailAndPassword(auth, email, password);
+                        console.log('✅ Conta criada com sucesso:', result.user.uid);
+                        showSuccess('Conta criada! Bem-vindo!');
+
+                    } catch (createError) {
+                        console.error('❌ Erro ao criar conta:', createError.code, createError.message);
+                        showError('Erro ao criar conta: ' + createError.message);
+                        loginBtn.disabled = false;
+                        loginBtn.textContent = 'Entrar';
+                    }
+                } else if (error.code === 'auth/wrong-password') {
+                    console.error('🔐 Senha incorreta');
+                    showError('Senha incorreta. Tente novamente.');
+                    loginBtn.disabled = false;
+                    loginBtn.textContent = 'Entrar';
+                } else if (error.code === 'auth/invalid-email') {
+                    console.error('📧 Email inválido');
+                    showError('Email inválido. Verifique e tente novamente.');
+                    loginBtn.disabled = false;
+                    loginBtn.textContent = 'Entrar';
+                } else {
+                    console.error('❌ Erro geral:', error.message);
+                    showError('Erro: ' + error.message);
+                    loginBtn.disabled = false;
+                    loginBtn.textContent = 'Entrar';
+                }
+            }
+        };
+
+        // Handle Logout
+        window.handleLogout = async () => {
+            try {
+                await signOut(auth);
+                console.log('✅ Logout realizado');
+            } catch (error) {
+                console.error('❌ Erro no logout:', error);
+            }
+        };
+
+        // Show Error
+        function showError(message) {
+            console.error('🔴 Mostrando erro:', message);
+            errorMsg.textContent = message;
+            errorMsg.classList.add('show');
+        }
+
+        // Show Success
+        function showSuccess(message) {
+            console.log('🟢 Mostrando sucesso:', message);
+            successMsg.textContent = message;
+            successMsg.classList.add('show');
+        }
+
+        // Auth State Changed
+        onAuthStateChanged(auth, (user) => {
+            console.log('🔔 onAuthStateChanged disparado:', user ? user.email : 'não autenticado');
+
+            if (user) {
+                // User is signed in
+                console.log('✅ Usuário autenticado:', user.email);
+                loginScreen.style.display = 'none';
+                appScreen.classList.add('show');
+                userEmail.textContent = user.email;
+            } else {
+                // User is signed out
+                console.log('🔓 Usuário não autenticado');
+                loginScreen.style.display = 'flex';
+                appScreen.classList.remove('show');
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Entrar';
+                document.getElementById('loginPassword').value = '';
+            }
+        });
+
+        // Log when module loads
+        console.log('✅ Script do Firebase carregado e pronto');
+    </script>
+</body>
+</html>
