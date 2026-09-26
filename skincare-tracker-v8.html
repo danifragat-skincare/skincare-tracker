@@ -20,6 +20,7 @@
             --gray-100: #f3f4f6;
             --gray-200: #e5e7eb;
             --gray-300: #d1d5db;
+            --gray-500: #6b7280;
             --gray-600: #4b5563;
             --gray-700: #374151;
             --gray-900: #111827;
@@ -355,6 +356,8 @@
                 <button class="tab-btn active" onclick="switchTab('rotina')">📅 Rotina Diária</button>
                 <button class="tab-btn" onclick="switchTab('peptideos')">💉 Peptídeos</button>
                 <button class="tab-btn" onclick="switchTab('calculadora')">🧮 Calculadora</button>
+                <button class="tab-btn" onclick="switchTab('produtos')">🧴 Produtos</button>
+                <button class="tab-btn" onclick="switchTab('estudos')">🔬 Estudos</button>
                 <button class="tab-btn" onclick="switchTab('pesquisa')">🔍 Pesquisar</button>
             </div>
         </div>
@@ -447,6 +450,195 @@
                         </div>
                         <div id="alertaSeringa" style="display:none;background:var(--warning);color:white;padding:1rem;border-radius:0.5rem;margin-top:1rem;text-align:center;font-weight:600;">⚠️ Dose ultrapassa capacidade da seringa!</div>
                     </div>
+                </div>
+            </div>
+        </div>
+        <div class="page" id="paginaProdutos">
+            <div class="container">
+                <div class="date-display">Meus Produtos Tópicos</div>
+
+                <!-- Product Card 1: Phytotratha Facial Sensitive Control -->
+                <div class="card">
+                    <div class="card-title">🫧 Phytotratha Facial Sensitive Control</div>
+                    <div style="font-size:0.85rem;color:var(--gray-500);margin-bottom:0.75rem;">Sabonete Suavizante · Phytoervas</div>
+                    <div style="margin-bottom:1rem;">
+                        <div style="font-weight:600;color:var(--primary);margin-bottom:0.4rem;">✨ Benefícios</div>
+                        <p style="font-size:0.9rem;color:var(--gray-700);line-height:1.6;">Higieniza suavemente sem agredir a barreira cutânea. Anti-irritante e anti-inflamatório, reduz vermelhidão e sensação de ardência. Ideal para peles sensíveis, rosácea, dermatite e pós-procedimento.</p>
+                    </div>
+                    <div style="margin-bottom:1rem;">
+                        <div style="font-weight:600;color:var(--primary);margin-bottom:0.4rem;">📋 Modo de Uso</div>
+                        <p style="font-size:0.9rem;color:var(--gray-700);line-height:1.6;">Aplicar em movimentos circulares suaves no rosto úmido. Remover com água ou algodão úmido. Usar pela manhã e/ou à noite como primeiro passo da rotina.</p>
+                    </div>
+                    <div>
+                        <div style="font-weight:600;color:var(--primary);margin-bottom:0.4rem;">🧪 Ativos Principais</div>
+                        <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
+                            <span style="background:var(--primary-light,#ede9fe);color:var(--primary);padding:0.3rem 0.7rem;border-radius:1rem;font-size:0.8rem;font-weight:500;">Extrato de Lavanda</span>
+                            <span style="background:var(--primary-light,#ede9fe);color:var(--primary);padding:0.3rem 0.7rem;border-radius:1rem;font-size:0.8rem;font-weight:500;">Extrato de Camomila</span>
+                            <span style="background:var(--primary-light,#ede9fe);color:var(--primary);padding:0.3rem 0.7rem;border-radius:1rem;font-size:0.8rem;font-weight:500;">Extrato de Calêndula</span>
+                            <span style="background:var(--primary-light,#ede9fe);color:var(--primary);padding:0.3rem 0.7rem;border-radius:1rem;font-size:0.8rem;font-weight:500;">pH Neutro</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Card 2: Creamy Retinol 0,3 -->
+                <div class="card">
+                    <div class="card-title">🌙 Gel-Creme Retinol 0,3%</div>
+                    <div style="font-size:0.85rem;color:var(--gray-500);margin-bottom:0.75rem;">Gel-Creme Noturno · Creamy Skincare</div>
+                    <div style="background:#fff3cd;border:1px solid #ffc107;border-radius:0.5rem;padding:0.75rem;margin-bottom:1rem;font-size:0.85rem;color:#856404;">
+                        ⚠️ <strong>Uso exclusivamente noturno.</strong> Sempre use protetor solar durante o dia.
+                    </div>
+                    <div style="margin-bottom:1rem;">
+                        <div style="font-weight:600;color:var(--primary);margin-bottom:0.4rem;">✨ Benefícios</div>
+                        <p style="font-size:0.9rem;color:var(--gray-700);line-height:1.6;">Melhora rugas profundas e linhas de expressão. Uniformiza textura e tom, reduz poros dilatados. Promove firmeza e elasticidade. Controla oleosidade e renova a pele durante o sono.</p>
+                    </div>
+                    <div style="margin-bottom:1rem;">
+                        <div style="font-weight:600;color:var(--primary);margin-bottom:0.4rem;">📋 Modo de Uso</div>
+                        <p style="font-size:0.9rem;color:var(--gray-700);line-height:1.6;">Apenas à noite. Iniciantes: começar em dias alternados por 2-3 semanas antes de usar diariamente. Aplicar em pele limpa e seca após limpeza. Não usar ao mesmo tempo com ácidos. Sempre usar protetor solar no dia seguinte.</p>
+                    </div>
+                    <div>
+                        <div style="font-weight:600;color:var(--primary);margin-bottom:0.4rem;">🧪 Ativos Principais</div>
+                        <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
+                            <span style="background:var(--primary-light,#ede9fe);color:var(--primary);padding:0.3rem 0.7rem;border-radius:1rem;font-size:0.8rem;font-weight:500;">Retinol 0,3%</span>
+                            <span style="background:var(--primary-light,#ede9fe);color:var(--primary);padding:0.3rem 0.7rem;border-radius:1rem;font-size:0.8rem;font-weight:500;">Nano-Vitamina C</span>
+                            <span style="background:var(--primary-light,#ede9fe);color:var(--primary);padding:0.3rem 0.7rem;border-radius:1rem;font-size:0.8rem;font-weight:500;">Epi-On® (anti-irritação)</span>
+                            <span style="background:var(--primary-light,#ede9fe);color:var(--primary);padding:0.3rem 0.7rem;border-radius:1rem;font-size:0.8rem;font-weight:500;">Phloretin</span>
+                            <span style="background:var(--primary-light,#ede9fe);color:var(--primary);padding:0.3rem 0.7rem;border-radius:1rem;font-size:0.8rem;font-weight:500;">Palmitoil Tripeptídeo-1</span>
+                            <span style="background:var(--primary-light,#ede9fe);color:var(--primary);padding:0.3rem 0.7rem;border-radius:1rem;font-size:0.8rem;font-weight:500;">Hexapeptídeo-12</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Card 3: Principia Mix-02 -->
+                <div class="card">
+                    <div class="card-title">💧 Sérum Mix-02</div>
+                    <div style="font-size:0.85rem;color:var(--gray-500);margin-bottom:0.75rem;">Sérum Clareador · Principia</div>
+                    <div style="margin-bottom:1rem;">
+                        <div style="font-weight:600;color:var(--primary);margin-bottom:0.4rem;">✨ Benefícios</div>
+                        <p style="font-size:0.9rem;color:var(--gray-700);line-height:1.6;">Clareia manchas de acne, sol e hormônios. Diminui olheiras e bolsas. Uniformiza a pigmentação e melhora o viço. 100% dos usuários notaram melhora em 60 dias de uso.</p>
+                    </div>
+                    <div style="margin-bottom:1rem;">
+                        <div style="font-weight:600;color:var(--primary);margin-bottom:0.4rem;">📋 Modo de Uso</div>
+                        <p style="font-size:0.9rem;color:var(--gray-700);line-height:1.6;">Usar de manhã e à noite. Aplicar em rosto limpo e seco, antes de cremes e protetor solar. Pode ser aplicado na área dos olhos com atenção.</p>
+                    </div>
+                    <div>
+                        <div style="font-weight:600;color:var(--primary);margin-bottom:0.4rem;">🧪 Ativos Principais</div>
+                        <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
+                            <span style="background:var(--primary-light,#ede9fe);color:var(--primary);padding:0.3rem 0.7rem;border-radius:1rem;font-size:0.8rem;font-weight:500;">Cafeína 5%</span>
+                            <span style="background:var(--primary-light,#ede9fe);color:var(--primary);padding:0.3rem 0.7rem;border-radius:1rem;font-size:0.8rem;font-weight:500;">Ácido Tranexâmico 3%</span>
+                            <span style="background:var(--primary-light,#ede9fe);color:var(--primary);padding:0.3rem 0.7rem;border-radius:1rem;font-size:0.8rem;font-weight:500;">Ácido Ferúlico 0,5%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Card 4: Principia PM-10 -->
+                <div class="card">
+                    <div class="card-title">✨ Sérum PM-10</div>
+                    <div style="font-size:0.85rem;color:var(--gray-500);margin-bottom:0.75rem;">Sérum de Peptídeos · Principia</div>
+                    <div style="margin-bottom:1rem;">
+                        <div style="font-weight:600;color:var(--primary);margin-bottom:0.4rem;">✨ Benefícios</div>
+                        <p style="font-size:0.9rem;color:var(--gray-700);line-height:1.6;">Reduz e previne rugas e linhas finas. Uniformiza a textura da pele. Aumenta firmeza e elasticidade. Hidratação intensa. 90% dos usuários notaram melhora em 60 dias.</p>
+                    </div>
+                    <div style="margin-bottom:1rem;">
+                        <div style="font-weight:600;color:var(--primary);margin-bottom:0.4rem;">📋 Modo de Uso</div>
+                        <p style="font-size:0.9rem;color:var(--gray-700);line-height:1.6;">Usar de manhã e à noite. Aplicar em rosto limpo e seco, antes de cremes. Pode ser usado na área dos olhos. Compatível com outras etapas da rotina.</p>
+                    </div>
+                    <div>
+                        <div style="font-weight:600;color:var(--primary);margin-bottom:0.4rem;">🧪 Ativos Principais</div>
+                        <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
+                            <span style="background:var(--primary-light,#ede9fe);color:var(--primary);padding:0.3rem 0.7rem;border-radius:1rem;font-size:0.8rem;font-weight:500;">Complexo Matrixyl 10%</span>
+                            <span style="background:var(--primary-light,#ede9fe);color:var(--primary);padding:0.3rem 0.7rem;border-radius:1rem;font-size:0.8rem;font-weight:500;">Palmitoil Tripeptídeo-1</span>
+                            <span style="background:var(--primary-light,#ede9fe);color:var(--primary);padding:0.3rem 0.7rem;border-radius:1rem;font-size:0.8rem;font-weight:500;">Palmitoil Tetrapeptídeo-7</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Card 5: Principia CM-01 -->
+                <div class="card">
+                    <div class="card-title">🌿 Creme CM-01</div>
+                    <div style="font-size:0.85rem;color:var(--gray-500);margin-bottom:0.75rem;">Creme Calmante Multirrepar ador · Principia</div>
+                    <div style="margin-bottom:1rem;">
+                        <div style="font-weight:600;color:var(--primary);margin-bottom:0.4rem;">✨ Benefícios</div>
+                        <p style="font-size:0.9rem;color:var(--gray-700);line-height:1.6;">Alivia ardência e irritação imediatamente. Reduz vermelhidão e descamação. Combate ressecamento profundo. Melhora firmeza e elasticidade. Ideal pós-procedimento ou em períodos de adaptação ao retinol.</p>
+                    </div>
+                    <div style="margin-bottom:1rem;">
+                        <div style="font-weight:600;color:var(--primary);margin-bottom:0.4rem;">📋 Modo de Uso</div>
+                        <p style="font-size:0.9rem;color:var(--gray-700);line-height:1.6;">Usar 2x ao dia (manhã e noite). Aplicar em rosto limpo e seco, espalhando suavemente até absorver completamente. Evitar contato direto com os olhos.</p>
+                    </div>
+                    <div>
+                        <div style="font-weight:600;color:var(--primary);margin-bottom:0.4rem;">🧪 Ativos Principais</div>
+                        <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
+                            <span style="background:var(--primary-light,#ede9fe);color:var(--primary);padding:0.3rem 0.7rem;border-radius:1rem;font-size:0.8rem;font-weight:500;">Pantenol 5%</span>
+                            <span style="background:var(--primary-light,#ede9fe);color:var(--primary);padding:0.3rem 0.7rem;border-radius:1rem;font-size:0.8rem;font-weight:500;">Glicerina 5%</span>
+                            <span style="background:var(--primary-light,#ede9fe);color:var(--primary);padding:0.3rem 0.7rem;border-radius:1rem;font-size:0.8rem;font-weight:500;">Esqualano 3%</span>
+                            <span style="background:var(--primary-light,#ede9fe);color:var(--primary);padding:0.3rem 0.7rem;border-radius:1rem;font-size:0.8rem;font-weight:500;">Manteiga de Karité 2%</span>
+                            <span style="background:var(--primary-light,#ede9fe);color:var(--primary);padding:0.3rem 0.7rem;border-radius:1rem;font-size:0.8rem;font-weight:500;">Bisabolol 1%</span>
+                            <span style="background:var(--primary-light,#ede9fe);color:var(--primary);padding:0.3rem 0.7rem;border-radius:1rem;font-size:0.8rem;font-weight:500;">Vitamina E 1%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Card 6: Mary Kay Protetor Solar FPS 50 -->
+                <div class="card">
+                    <div class="card-title">☀️ Protetor Solar FPS 50</div>
+                    <div style="font-size:0.85rem;color:var(--gray-500);margin-bottom:0.75rem;">Protetor Solar Face & Body · Mary Kay</div>
+                    <div style="background:#d1ecf1;border:1px solid #bee5eb;border-radius:0.5rem;padding:0.75rem;margin-bottom:1rem;font-size:0.85rem;color:#0c5460;">
+                        ☀️ <strong>Obrigatório todo dia</strong> — especialmente ao usar retinol ou ácidos.
+                    </div>
+                    <div style="margin-bottom:1rem;">
+                        <div style="font-weight:600;color:var(--primary);margin-bottom:0.4rem;">✨ Benefícios</div>
+                        <p style="font-size:0.9rem;color:var(--gray-700);line-height:1.6;">Proteção ampla espectro UVA + UVB. FPS 50 com alta proteção solar. Resistente à água por até 80 minutos. Adequado para rosto e corpo.</p>
+                    </div>
+                    <div>
+                        <div style="font-weight:600;color:var(--primary);margin-bottom:0.4rem;">📋 Modo de Uso</div>
+                        <p style="font-size:0.9rem;color:var(--gray-700);line-height:1.6;">Aplicar generosamente 15-30 minutos antes da exposição ao sol. Reaplicar a cada 2 horas ou após nadar/suar. Usar como último passo da rotina matinal, sobre o sérum e hidratante.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="page" id="paginaEstudos">
+            <div class="container">
+                <div class="date-display">Estudos Científicos</div>
+
+                <!-- Tirzepatida -->
+                <div class="card">
+                    <div class="card-title">💉 Tirzepatida</div>
+                    <div style="font-size:0.85rem;color:var(--gray-500);margin-bottom:0.75rem;">GIP/GLP-1 Agonista Dual</div>
+                    <div class="empty-state"><div class="empty-state-icon">📄</div><p>Estudos serão adicionados em breve</p></div>
+                </div>
+
+                <!-- Retatrutida -->
+                <div class="card">
+                    <div class="card-title">💉 Retatrutida</div>
+                    <div style="font-size:0.85rem;color:var(--gray-500);margin-bottom:0.75rem;">GIP/GLP-1/Glucagon Agonista Triple</div>
+                    <div class="empty-state"><div class="empty-state-icon">📄</div><p>Estudos serão adicionados em breve</p></div>
+                </div>
+
+                <!-- GHK-Cu -->
+                <div class="card">
+                    <div class="card-title">💉 GHK-Cu</div>
+                    <div style="font-size:0.85rem;color:var(--gray-500);margin-bottom:0.75rem;">Tripeptídeo de Cobre</div>
+                    <div class="empty-state"><div class="empty-state-icon">📄</div><p>Estudos serão adicionados em breve</p></div>
+                </div>
+
+                <!-- BPC-157 -->
+                <div class="card">
+                    <div class="card-title">💉 BPC-157</div>
+                    <div style="font-size:0.85rem;color:var(--gray-500);margin-bottom:0.75rem;">Body Protection Compound</div>
+                    <div class="empty-state"><div class="empty-state-icon">📄</div><p>Estudos serão adicionados em breve</p></div>
+                </div>
+
+                <!-- TB 500 -->
+                <div class="card">
+                    <div class="card-title">💉 TB 500</div>
+                    <div style="font-size:0.85rem;color:var(--gray-500);margin-bottom:0.75rem;">Thymosin Beta-4</div>
+                    <div class="empty-state"><div class="empty-state-icon">📄</div><p>Estudos serão adicionados em breve</p></div>
+                </div>
+
+                <!-- GLOW -->
+                <div class="card">
+                    <div class="card-title">💉 GLOW</div>
+                    <div style="font-size:0.85rem;color:var(--gray-500);margin-bottom:0.75rem;">Blend de Peptídeos</div>
+                    <div class="empty-state"><div class="empty-state-icon">📄</div><p>Estudos serão adicionados em breve</p></div>
                 </div>
             </div>
         </div>
