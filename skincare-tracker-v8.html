@@ -31,6 +31,717 @@
             color: var(--gray-900);
         }
 
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .header-title { font-size: 1.5rem; font-weight: 700; }
+        .header-user { font-size: 0.9rem; opacity: 0.9; }
+
+        .btn-logout {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .tabs {
+            background: white;
+            border-bottom: 2px solid var(--gray-200);
+            position: sticky;
+            top: 60px;
+            z-index: 99;
+            overflow-x: auto;
+        }
+
+        .tabs-container {
+            display: flex;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .tab-btn {
+            padding: 1rem 1.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--gray-600);
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .tab-btn:hover { color: var(--primary); }
+        .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+        .container { max-width: 1000px; margin: 0 auto; padding: 2rem 1rem; }
+        .page { display: none; }
+        .page.active { display: block; }
+
+        .date-display {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            text-transform: capitalize;
+        }
+
+        .card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid var(--gray-200);
+        }
+
+        .card-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 1.5rem; color: var(--gray-900); }
+
+        .ghkcu-status {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px rgba(124, 58, 237, 0.2);
+        }
+
+        .ghkcu-info { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem; }
+        .ghkcu-item { background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 0.5rem; }
+        .ghkcu-label { font-size: 0.9rem; opacity: 0.9; margin-bottom: 0.5rem; }
+        .ghkcu-value { font-size: 1.5rem; font-weight: 700; }
+
+        .rotina-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--gray-50);
+            border-radius: 0.5rem;
+            margin-bottom: 0.75rem;
+            border-left: 4px solid var(--primary);
+        }
+
+        .rotina-item.completed { opacity: 0.6; border-left-color: var(--success); }
+        .rotina-item.completed label { text-decoration: line-through; }
+        .rotina-item input[type="checkbox"] { width: 1.2rem; height: 1.2rem; cursor: pointer; }
+        .produto-info { flex: 1; }
+        .produto-info label { display: block; font-weight: 600; margin-bottom: 0.25rem; cursor: pointer; }
+        .produto-marca { font-size: 0.85rem; color: var(--gray-600); }
+
+        .btn-delete {
+            background: transparent;
+            color: var(--accent);
+            border: 1px solid var(--accent);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .btn-add, .btn-primary {
+            background: var(--primary);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 600;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .btn-add { margin-top: 1rem; }
+
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--gray-900); }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--gray-300);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-family: inherit;
+        }
+
+        .peptideo-form { background: var(--gray-50); padding: 1.5rem; border-radius: 0.5rem; margin-bottom: 1rem; }
+        .calculadora-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+        .resultado { text-align: center; padding: 2rem; background: var(--primary); color: white; border-radius: 0.5rem; margin-bottom: 1.5rem; }
+        .resultado-valor { font-size: 2.5rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .resultado-label { font-size: 0.95rem; opacity: 0.95; }
+
+        .historico-item { background: var(--gray-50); padding: 1rem; border-radius: 0.5rem; margin-bottom: 0.75rem; border-left: 4px solid var(--accent); }
+        .historico-data { font-weight: 600; margin-bottom: 0.25rem; }
+        .historico-detalhes { font-size: 0.85rem; color: var(--gray-600); }
+
+        .peptideo-uso-item {
+            background: var(--gray-50);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--success);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .peptideo-uso-info { flex: 1; }
+        .peptideo-uso-nome { font-weight: 700; font-size: 1.1rem; margin-bottom: 0.5rem; }
+        .peptideo-uso-tempo { font-size: 0.9rem; color: var(--gray-600); margin-bottom: 0.25rem; }
+        .peptideo-uso-dose { font-size: 0.9rem; color: var(--success); font-weight: 600; }
+
+        .link-claude { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .link-btn {
+            background: var(--primary);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            text-align: center;
+            font-weight: 600;
+            border: 2px solid var(--primary);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .modal.show { display: flex; }
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem; color: var(--primary); }
+        .btn-secondary { background: var(--gray-200); color: var(--gray-900); padding: 0.75rem 1.5rem; border: none; border-radius: 0.5rem; cursor: pointer; width: 100%; margin-top: 0.5rem; }
+
+        .spinner {
+            display: inline-block;
+            width: 2rem; height: 2rem;
+            border: 3px solid rgba(124,58,237,0.2);
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .empty-state { text-align: center; padding: 2rem; color: var(--gray-600); }
+        .empty-state-icon { font-size: 3rem; margin-bottom: 1rem; }
+
+        .login-screen {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            padding: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-screen" id="loginScreen">
+        <div id="loadingScreen" style="text-align:center; color:white;">
+            <div class="spinner" style="width:40px;height:40px;border:4px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 1rem;"></div>
+            <p>Carregando...</p>
+        </div>
+        <div id="loginForm" style="display:none; background:white; border-radius:1.5rem; padding:2.5rem; width:100%; max-width:420px; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+            <div style="text-align:center; margin-bottom:2rem;">
+                <div style="font-size:3rem; margin-bottom:0.5rem;">🌟</div>
+                <h1 style="font-size:1.8rem; font-weight:700; color:var(--primary); margin-bottom:0.25rem;">Skincare Tracker</h1>
+                <p style="color:#6b7280; font-size:0.95rem;">Faça login para continuar</p>
+            </div>
+            <form id="loginFormEl" onsubmit="handleLogin(event)">
+                <div style="margin-bottom:1.25rem;">
+                    <label style="display:block; font-weight:600; color:#374151; margin-bottom:0.5rem;">Email</label>
+                    <input type="email" id="emailInput" placeholder="seu@email.com" required
+                        style="width:100%; padding:0.875rem 1rem; border:2px solid #e5e7eb; border-radius:0.75rem; font-size:1rem; outline:none;"
+                        onfocus="this.style.borderColor='#7c3aed'" onblur="this.style.borderColor='#e5e7eb'">
+                </div>
+                <div style="margin-bottom:1.5rem;">
+                    <label style="display:block; font-weight:600; color:#374151; margin-bottom:0.5rem;">Senha</label>
+                    <input type="password" id="passwordInput" placeholder="••••••••" required
+                        style="width:100%; padding:0.875rem 1rem; border:2px solid #e5e7eb; border-radius:0.75rem; font-size:1rem; outline:none;"
+                        onfocus="this.style.borderColor='#7c3aed'" onblur="this.style.borderColor='#e5e7eb'">
+                </div>
+                <div id="loginError" style="display:none; background:#fef2f2; color:#dc2626; padding:0.75rem 1rem; border-radius:0.5rem; margin-bottom:1rem; font-size:0.9rem;"></div>
+                <button type="submit" id="loginBtn"
+                    style="width:100%; padding:1rem; background:linear-gradient(135deg,#7c3aed,#6d28d9); color:white; border:none; border-radius:0.75rem; font-size:1rem; font-weight:600; cursor:pointer;">
+                    Entrar
+                </button>
+            </form>
+            <div style="text-align:center; margin-top:1.5rem;">
+                <p style="color:#6b7280; font-size:0.9rem;">Não tem conta? <a href="#" onclick="showRegister()" style="color:#7c3aed; font-weight:600; text-decoration:none;">Criar conta</a></p>
+            </div>
+        </div>
+        <div id="registerForm" style="display:none; background:white; border-radius:1.5rem; padding:2.5rem; width:100%; max-width:420px; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+            <div style="text-align:center; margin-bottom:2rem;">
+                <div style="font-size:3rem; margin-bottom:0.5rem;">✨</div>
+                <h1 style="font-size:1.8rem; font-weight:700; color:var(--primary); margin-bottom:0.25rem;">Criar Conta</h1>
+                <p style="color:#6b7280; font-size:0.95rem;">Seu rastreador de skincare</p>
+            </div>
+            <form id="registerFormEl" onsubmit="handleRegister(event)">
+                <div style="margin-bottom:1.25rem;">
+                    <label style="display:block; font-weight:600; color:#374151; margin-bottom:0.5rem;">Email</label>
+                    <input type="email" id="regEmailInput" placeholder="seu@email.com" required
+                        style="width:100%; padding:0.875rem 1rem; border:2px solid #e5e7eb; border-radius:0.75rem; font-size:1rem; outline:none;"
+                        onfocus="this.style.borderColor='#7c3aed'" onblur="this.style.borderColor='#e5e7eb'">
+                </div>
+                <div style="margin-bottom:1.5rem;">
+                    <label style="display:block; font-weight:600; color:#374151; margin-bottom:0.5rem;">Senha</label>
+                    <input type="password" id="regPasswordInput" placeholder="mínimo 6 caracteres" required minlength="6"
+                        style="width:100%; padding:0.875rem 1rem; border:2px solid #e5e7eb; border-radius:0.75rem; font-size:1rem; outline:none;"
+                        onfocus="this.style.borderColor='#7c3aed'" onblur="this.style.borderColor='#e5e7eb'">
+                </div>
+                <div id="registerError" style="display:none; background:#fef2f2; color:#dc2626; padding:0.75rem 1rem; border-radius:0.5rem; margin-bottom:1rem; font-size:0.9rem;"></div>
+                <button type="submit" id="registerBtn"
+                    style="width:100%; padding:1rem; background:linear-gradient(135deg,#7c3aed,#6d28d9); color:white; border:none; border-radius:0.75rem; font-size:1rem; font-weight:600; cursor:pointer;">
+                    Criar Conta
+                </button>
+            </form>
+            <div style="text-align:center; margin-top:1.5rem;">
+                <p style="color:#6b7280; font-size:0.9rem;">Já tem conta? <a href="#" onclick="showLogin()" style="color:#7c3aed; font-weight:600; text-decoration:none;">Fazer login</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- APP SCREEN -->
+    <div class="app-screen" id="appScreen" style="display:none;">
+        <header>
+            <div class="header-content">
+                <div>
+                    <div class="header-title">🌟 Skincare + Peptídeos</div>
+                    <div class="header-user" id="headerUser"></div>
+                </div>
+                <button class="btn-logout" onclick="handleLogout()">Sair</button>
+            </div>
+        </header>
+        <div class="tabs">
+            <div class="tabs-container">
+                <button class="tab-btn active" onclick="switchTab('rotina')">📅 Rotina Diária</button>
+                <button class="tab-btn" onclick="switchTab('peptideos')">💉 Peptídeos</button>
+                <button class="tab-btn" onclick="switchTab('calculadora')">🧮 Calculadora</button>
+                <button class="tab-btn" onclick="switchTab('pesquisa')">🔍 Pesquisar</button>
+            </div>
+        </div>
+        <div class="page active" id="paginaRotina">
+            <div class="container">
+                <div class="date-display" id="dateDisplay"></div>
+                <div class="card">
+                    <div class="card-title">💊 Peptídeos em Uso</div>
+                    <div id="peptideosEmUso"><div class="empty-state"><div class="empty-state-icon">💉</div><p>Nenhum peptídeo em uso</p></div></div>
+                    <button class="btn-add" onclick="openAddPeptideoEmUsoModal()">+ Adicionar Peptídeo</button>
+                </div>
+                <div class="ghkcu-status" id="ghkcuCard">
+                    <div style="font-size:1.3rem; font-weight:700; margin-bottom:0.5rem;">💊 Status GHK-Cu</div>
+                    <div class="ghkcu-info">
+                        <div class="ghkcu-item"><div class="ghkcu-label">Dosagem</div><div class="ghkcu-value" id="ghkcuDosagem">3mg</div></div>
+                        <div class="ghkcu-item"><div class="ghkcu-label">Próxima Aplicação</div><div class="ghkcu-value" id="ghkcuProxima">Hoje</div></div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title">🌅 Rotina Manhã</div>
+                    <div id="rotinaManha"><div class="empty-state"><div class="empty-state-icon">🧴</div><p>Nenhum produto</p></div></div>
+                    <button class="btn-add" onclick="openAddProductModal('manha')">+ Adicionar Produto</button>
+                </div>
+                <div class="card">
+                    <div class="card-title">🌙 Rotina Noite</div>
+                    <div id="rotinaNoite"><div class="empty-state"><div class="empty-state-icon">🧴</div><p>Nenhum produto</p></div></div>
+                    <button class="btn-add" onclick="openAddProductModal('noite')">+ Adicionar Produto</button>
+                </div>
+            </div>
+        </div>
+        <div class="page" id="paginaPeptideos">
+            <div class="container">
+                <div class="date-display">Gerenciamento de Peptídeos Injetáveis</div>
+                <div class="card">
+                    <div class="card-title">💉 Registrar Nova Dose</div>
+                    <div class="peptideo-form">
+                        <div class="form-group"><label>Tipo</label><select id="peptideoNome"><option value="">Selecione</option><option>Tesamorelin</option><option>BPC-157</option><option>GHK-Cu 100mg</option><option>GHK-Cu 50mg</option><option>Ipamorelin</option><option>KPV</option><option>MOTS-c</option><option>PT-141</option><option>Semax</option><option>TB500</option><option>Retatrutida 40mg</option><option>Tirzepatida 40mg</option><option>Epitalon</option><option>Outro</option></select></div>
+                        <div class="form-group"><label>Dose (mg)</label><input type="number" id="dosePeptideo" placeholder="Ex: 3" step="0.1"></div>
+                        <div class="form-group"><label>Local</label><select id="localAplicacao"><option value="">Selecione</option><option>Subcutânea</option><option>Intramuscular</option><option>Tópica</option></select></div>
+                        <div class="form-group"><label>Notas (opcional)</label><input type="text" id="notasPeptideo" placeholder="Resultado, sensações..."></div>
+                        <button class="btn-primary" onclick="saveDosePeptideo()">Registrar Dose</button>
+                    </div>
+                </div>
+                <div class="card"><div class="card-title">📋 Histórico</div><div id="historicoPeptideos"><div class="empty-state"><div class="empty-state-icon">📊</div><p>Nenhuma dose</p></div></div></div>
+            </div>
+        </div>
+        <div class="page" id="paginaCalculadora">
+            <div class="container">
+                <div class="date-display">Calculadora de Reconstituição</div>
+                <div class="card">
+                    <div class="card-title">🧮 Calcular Reconstitução</div>
+                    <div class="peptideo-form">
+                        <div class="form-group"><label>1. Qual peptídeo?</label><select id="calcPeptideo" onchange="atualizarCalculadora()"><option value="">Selecione</option><option value="bpc157">BPC-157</option><option value="ghkcu100">GHK-Cu 100mg</option><option value="ipamorelin">Ipamorelin</option><option value="tb500">TB500</option><option value="outro">Outro</option></select></div>
+                        <div class="calculadora-inputs">
+                            <div class="form-group"><label>2. Quantidade (mg)</label><input type="number" id="conteudoFrasco" placeholder="Ex: 5" step="0.1" min="0" oninput="atualizarCalculadora()"></div>
+                            <div class="form-group"><label>3. Água bact. (ml)</label><input type="number" id="volumeAgua" placeholder="Ex: 2" step="0.1" min="0" oninput="atualizarCalculadora()"></div>
+                        </div>
+                        <div class="form-group"><label>4. Dose desejada (mg)</label><input type="number" id="dosePorInjecao" placeholder="Ex: 1" step="0.1" min="0" oninput="atualizarCalculadora()"></div>
+                        <div class="form-group"><label>5. Seringa</label><div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.5rem;">
+                            <label style="display:flex;align-items:center;gap:0.5rem;"><input type="radio" name="tamanhoSeringa" value="30" onchange="atualizarCalculadora()"> 30U</label>
+                            <label style="display:flex;align-items:center;gap:0.5rem;"><input type="radio" name="tamanhoSeringa" value="50" checked onchange="atualizarCalculadora()"> 50U</label>
+                            <label style="display:flex;align-items:center;gap:0.5rem;"><input type="radio" name="tamanhoSeringa" value="100" onchange="atualizarCalculadora()"> 100U</label>
+                        </div></div>
+                    </div>
+                    <div id="resultadoCalc" style="display:none; margin-top:2rem;">
+                        <div class="resultado"><div class="resultado-valor" id="unidadesAPuxar">—</div><div class="resultado-label">Unidades a puxar</div></div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1.5rem;">
+                            <div style="background:var(--gray-50);padding:1rem;border-radius:0.5rem;border-left:4px solid var(--primary);"><div style="font-size:0.85rem;color:var(--gray-600);">Concentração</div><div style="font-size:1.3rem;font-weight:700;color:var(--primary);" id="concentracao">—</div></div>
+                            <div style="background:var(--gray-50);padding:1rem;border-radius:0.5rem;border-left:4px solid var(--success);"><div style="font-size:0.85rem;color:var(--gray-600);">Doses/frasco</div><div style="font-size:1.3rem;font-weight:700;color:var(--success);" id="dosesFreco">—</div></div>
+                        </div>
+                        <div id="alertaSeringa" style="display:none;background:var(--warning);color:white;padding:1rem;border-radius:0.5rem;margin-top:1rem;text-align:center;font-weight:600;">⚠️ Dose ultrapassa capacidade da seringa!</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="page" id="paginaPesquisa">
+            <div class="container">
+                <div class="date-display">Pesquisar Produtos</div>
+                <div class="card">
+                    <div class="card-title">🔍 Links Úteis</div>
+                    <div class="link-claude">
+                        <a href="https://claude.ai" target="_blank" class="link-btn">💬 Chat com Claude<br><span style="font-size:0.8rem;font-weight:normal;">Pesquise ingredientes e protocolos</span></a>
+                        <a href="https://www.google.com/search?q=skincare+peptideos" target="_blank" class="link-btn">🔎 Google<br><span style="font-size:0.8rem;font-weight:normal;">Buscar avaliações</span></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="addProductModal">
+        <div class="modal-content">
+            <div class="modal-title">Adicionar Produto</div>
+            <form onsubmit="saveProduct(event)">
+                <div class="form-group"><label>Nome *</label><input type="text" id="productNome" required></div>
+                <div class="form-group"><label>Marca</label><input type="text" id="productMarca"></div>
+                <div class="form-group"><label>Tipo</label><select id="productTipo"><option value="">Selecione</option><option>Limpador</option><option>Tônico</option><option>Sérum</option><option>Hidratante</option><option>Protetor Solar</option><option>Outro</option></select></div>
+                <button type="submit" class="btn-primary">Adicionar</button>
+                <button type="button" class="btn-secondary" onclick="closeAddProductModal()">Cancelar</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="addPeptideoEmUsoModal">
+        <div class="modal-content">
+            <div class="modal-title">Adicionar Peptídeo em Uso</div>
+            <form onsubmit="savePeptideoEmUso(event)">
+                <div class="form-group"><label>Tipo *</label><select id="peptideoEmUsoNome" required><option value="">Selecione</option><option>Tesamorelin</option><option>BPC-157</option><option>GHK-Cu 100mg</option><option>GHK-Cu 50mg</option><option>Ipamorelin</option><option>TB500</option><option>Epitalon</option><option>Outro</option></select></div>
+                <div class="form-group"><label>Dose (mg) *</label><input type="number" id="peptideoEmUsoDose" step="0.1" required></div>
+                <div class="form-group"><label>Data Início *</label><input type="date" id="peptideoEmUsoDataInicio" required></div>
+                <button type="submit" class="btn-primary">Adicionar</button>
+                <button type="button" class="btn-secondary" onclick="closeAddPeptideoEmUsoModal()">Cancelar</button>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js';
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js';
+        import { getDatabase, ref, set, onValue, remove } from 'https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCrbmmAnMK_NGEHcYj5ZxF7eOJmSGNDp1s",
+            authDomain: "skincare-traker.firebaseapp.com",
+            databaseURL: "https://skincare-traker-default-rtdb.firebaseio.com",
+            projectId: "skincare-traker",
+            storageBucket: "skincare-traker.firebasestorage.app",
+            messagingSenderId: "201395673110",
+            appId: "1:201395673110:web:d827e5e396b1f6806e3d37"
+        };
+
+        let app, auth, db, currentUser = null, currentPeriodo = null;
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getDatabase(app);
+            console.log('✅ Firebase inicializado');
+        } catch(e) { console.error('❌ Firebase:', e); }
+
+        const loginScreen = document.getElementById('loginScreen');
+        const appScreen = document.getElementById('appScreen');
+        const headerUser = document.getElementById('headerUser');
+        const dateDisplay = document.getElementById('dateDisplay');
+        const addProductModal = document.getElementById('addProductModal');
+        const addPeptideoEmUsoModal = document.getElementById('addPeptideoEmUsoModal');
+
+        window.switchTab = function(tabName) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('pagina' + tabName.charAt(0).toUpperCase() + tabName.slice(1)).classList.add('active');
+            event.target.classList.add('active');
+        };
+
+        function formatDate(d) { return d.toLocaleDateString('pt-BR', {weekday:'long',year:'numeric',month:'long',day:'numeric'}); }
+
+        function calcularTempoDecorrido(dataInicio) {
+            const dias = Math.floor((new Date() - new Date(dataInicio)) / (1000*60*60*24));
+            if (dias === 0) return 'Iniciado hoje';
+            if (dias === 1) return '1 dia em uso';
+            if (dias < 7) return dias + ' dias em uso';
+            const sem = Math.floor(dias/7), r = dias%7;
+            return sem + ' semana' + (sem>1?'s':'') + (r?' e '+r+' dia'+(r>1?'s':''):'') + ' em uso';
+        }
+
+        window.openAddPeptideoEmUsoModal = function() {
+            document.getElementById('peptideoEmUsoNome').value = '';
+            document.getElementById('peptideoEmUsoDose').value = '';
+            document.getElementById('peptideoEmUsoDataInicio').value = new Date().toISOString().split('T')[0];
+            addPeptideoEmUsoModal.classList.add('show');
+        };
+        window.closeAddPeptideoEmUsoModal = function() { addPeptideoEmUsoModal.classList.remove('show'); };
+
+        window.savePeptideoEmUso = async function(event) {
+            event.preventDefault();
+            const nome = document.getElementById('peptideoEmUsoNome').value;
+            const dose = document.getElementById('peptideoEmUsoDose').value;
+            const dataInicio = document.getElementById('peptideoEmUsoDataInicio').value;
+            if (!nome || !dose || !dataInicio || !currentUser) { alert('Preencha todos os campos'); return; }
+            try {
+                await set(ref(db, 'users/'+currentUser.uid+'/peptideos_em_uso/'+Date.now()), { nome, dose: parseFloat(dose), dataInicio, adicionadoEm: new Date().toISOString() });
+                closeAddPeptideoEmUsoModal();
+                alert('Peptídeo adicionado!');
+            } catch(e) { alert('Erro: '+e.message); }
+        };
+
+        window.deletePeptideoEmUso = async function(id) {
+            if (confirm('Remover?')) { try { await remove(ref(db,'users/'+currentUser.uid+'/peptideos_em_uso/'+id)); } catch(e){} }
+        };
+
+        function displayPeptideosEmUso(peptideos) {
+            const c = document.getElementById('peptideosEmUso');
+            if (!peptideos || !Object.keys(peptideos).length) { c.innerHTML = '<div class="empty-state"><div class="empty-state-icon">💉</div><p>Nenhum peptídeo em uso</p></div>'; return; }
+            c.innerHTML = '';
+            Object.entries(peptideos).forEach(([id,p]) => {
+                c.innerHTML += '<div class="peptideo-uso-item"><div class="peptideo-uso-info"><div class="peptideo-uso-nome">'+p.nome+'</div><div class="peptideo-uso-tempo">📅 '+calcularTempoDecorrido(p.dataInicio)+'</div><div class="peptideo-uso-dose">💊 '+p.dose+'mg</div></div><button type="button" class="btn-delete" onclick="deletePeptideoEmUso(\'' + id + '\')">Remover</button></div>';
+            });
+        }
+
+        window.openAddProductModal = function(periodo) {
+            currentPeriodo = periodo;
+            ['productNome','productMarca'].forEach(id => document.getElementById(id).value = '');
+            document.getElementById('productTipo').value = '';
+            addProductModal.classList.add('show');
+        };
+        window.closeAddProductModal = function() { addProductModal.classList.remove('show'); };
+
+        window.saveProduct = async function(event) {
+            event.preventDefault();
+            const nome = document.getElementById('productNome').value;
+            if (!nome || !currentUser || !currentPeriodo) return;
+            try {
+                await set(ref(db,'users/'+currentUser.uid+'/rotinas/'+currentPeriodo+'/'+Date.now()), {
+                    nome, marca: document.getElementById('productMarca').value||'Sem marca',
+                    tipo: document.getElementById('productTipo').value||'Sem tipo', aplicado: false, adicionadoEm: new Date().toISOString()
+                });
+                closeAddProductModal();
+            } catch(e) { alert('Erro: '+e.message); }
+        };
+
+        window.deleteProduto = async function(uid,periodo,id) {
+            if (confirm('Deletar?')) { try { await remove(ref(db,'users/'+uid+'/rotinas/'+periodo+'/'+id)); } catch(e){} }
+        };
+
+        window.updateProduto = async function(uid,periodo,id,aplicado) {
+            try { await set(ref(db,'users/'+uid+'/rotinas/'+periodo+'/'+id+'/aplicado'), aplicado); } catch(e){}
+        };
+
+        function displayRotina(elementId, rotina, periodo) {
+            const c = document.getElementById(elementId);
+            if (!rotina || !Object.keys(rotina).length) { c.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🧴</div><p>Nenhum produto</p></div>'; return; }
+            c.innerHTML = '';
+            Object.entries(rotina).forEach(([id,p]) => {
+                c.innerHTML += '<div class="rotina-item '+(p.aplicado?'completed':'')+'"><input type="checkbox" '+(p.aplicado?'checked':'')+' onchange="updateProduto(\''+currentUser.uid+'\',\''+periodo+'\',\''+id+'\',this.checked)"><div class="produto-info"><label>'+p.nome+'</label><div class="produto-marca">'+p.marca+'</div></div><button type="button" class="btn-delete" onclick="deleteProduto(\''+currentUser.uid+'\',\''+periodo+'\',\''+id+'\')" >Deletar</button></div>';
+            });
+        }
+
+        async function loadDashboard(user) {
+            headerUser.textContent = user.email;
+            dateDisplay.textContent = formatDate(new Date());
+            onValue(ref(db,'users/'+user.uid), (snap) => {
+                const data = snap.val()||{};
+                displayRotina('rotinaManha', data.rotinas?.manha||{}, 'manha');
+                displayRotina('rotinaNoite', data.rotinas?.noite||{}, 'noite');
+                document.getElementById('ghkcuDosagem').textContent = data.ghkcu?.dosagem||'3mg';
+                document.getElementById('ghkcuProxima').textContent = data.ghkcu?.proximaAplicacao||'Hoje';
+                displayPeptideosEmUso(data.peptideos_em_uso||{});
+                displayHistoricoPeptideos(data.peptideos||{});
+            });
+        }
+
+        function displayHistoricoPeptideos(peptideos) {
+            const c = document.getElementById('historicoPeptideos');
+            if (!peptideos || !Object.keys(peptideos).length) { c.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📊</div><p>Nenhuma dose</p></div>'; return; }
+            c.innerHTML = '';
+            Object.entries(peptideos).sort((a,b)=>new Date(b[1].data)-new Date(a[1].data)).forEach(([id,d]) => {
+                c.innerHTML += '<div class="historico-item"><div class="historico-data">'+d.tipo+' - '+d.dosagem+'mg</div><div class="historico-detalhes">'+new Date(d.data).toLocaleDateString('pt-BR')+' • '+d.local+'</div>'+(d.notas?'<div class="historico-detalhes">📝 '+d.notas+'</div>':'')+'</div>';
+            });
+        }
+
+        window.saveDosePeptideo = async function() {
+            const tipo = document.getElementById('peptideoNome').value;
+            const dosagem = document.getElementById('dosePeptideo').value;
+            const local = document.getElementById('localAplicacao').value;
+            const notas = document.getElementById('notasPeptideo').value;
+            if (!tipo||!dosagem||!local||!currentUser) { alert('Preencha todos os campos'); return; }
+            try {
+                await set(ref(db,'users/'+currentUser.uid+'/peptideos/'+Date.now()), { tipo, dosagem:parseFloat(dosagem), local, notas, data:new Date().toISOString() });
+                ['peptideoNome','dosePeptideo','localAplicacao','notasPeptideo'].forEach(id => document.getElementById(id).value='');
+                alert('Dose registrada!');
+            } catch(e) { alert('Erro: '+e.message); }
+        };
+
+        window.atualizarCalculadora = function() {
+            const cf = parseFloat(document.getElementById('conteudoFrasco').value);
+            const va = parseFloat(document.getElementById('volumeAgua').value);
+            const dp = parseFloat(document.getElementById('dosePorInjecao').value);
+            const ts = document.querySelector('input[name="tamanhoSeringa"]:checked').value;
+            if (!cf||!va||!dp) { document.getElementById('resultadoCalc').style.display='none'; return; }
+            const conc = cf/va;
+            const u = Math.round((dp/conc)*100);
+            document.getElementById('unidadesAPuxar').textContent = u+' U';
+            document.getElementById('concentracao').textContent = conc.toFixed(2)+' mg/ml';
+            document.getElementById('dosesFreco').textContent = Math.round((cf/dp)*10)/10;
+            document.getElementById('alertaSeringa').style.display = u>parseInt(ts)?'block':'none';
+            document.getElementById('resultadoCalc').style.display = 'block';
+        };
+
+        function showLogin() {
+            document.getElementById('loadingScreen').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('registerForm').style.display = 'none';
+        }
+
+        window.showRegister = function() {
+            document.getElementById('loadingScreen').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+        };
+
+        window.showLogin = showLogin;
+
+        window.handleLogin = async function(event) {
+            event.preventDefault();
+            const email = document.getElementById('emailInput').value;
+            const password = document.getElementById('passwordInput').value;
+            const btn = document.getElementById('loginBtn');
+            const err = document.getElementById('loginError');
+            btn.textContent='Entrando...'; btn.disabled=true; err.style.display='none';
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+            } catch(e) {
+                let msg = 'Erro ao fazer login.';
+                if (e.code==='auth/user-not-found') msg='Usuário não encontrado.';
+                if (e.code==='auth/wrong-password') msg='Senha incorreta.';
+                if (e.code==='auth/invalid-credential') msg='Email ou senha incorretos.';
+                if (e.code==='auth/invalid-email') msg='Email inválido.';
+                err.textContent=msg; err.style.display='block';
+                btn.textContent='Entrar'; btn.disabled=false;
+            }
+        };
+
+        window.handleRegister = async function(event) {
+            event.preventDefault();
+            const email = document.getElementById('regEmailInput').value;
+            const password = document.getElementById('regPasswordInput').value;
+            const btn = document.getElementById('registerBtn');
+            const err = document.getElementById('registerError');
+            btn.textContent='Criando...'; btn.disabled=true; err.style.display='none';
+            try {
+                await createUserWithEmailAndPassword(auth, email, password);
+            } catch(e) {
+                let msg='Erro ao criar conta.';
+                if (e.code==='auth/email-already-in-use') msg='Email já cadastrado. Faça login.';
+                if (e.code==='auth/weak-password') msg='Senha fraca. Use 6+ caracteres.';
+                if (e.code==='auth/invalid-email') msg='Email inválido.';
+                err.textContent=msg; err.style.display='block';
+                btn.textContent='Criar Conta'; btn.disabled=false;
+            }
+        };
+
+        window.handleLogout = async () => { try { await signOut(auth); } catch(e){} };
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                loginScreen.style.display = 'none';
+                appScreen.style.display = 'block';
+                loadDashboard(user);
+            } else {
+                loginScreen.style.display = 'flex';
+                appScreen.style.display = 'none';
+                showLogin();
+            }
+        });
+
+        console.log('✅ App carregado');
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Rastreador de skincare + Peptídeos">
+    <meta name="theme-color" content="#7c3aed">
+    <title>Skincare Tracker - Multi Seções</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary: #7c3aed;
+            --primary-light: #a78bfa;
+            --primary-dark: #6d28d9;
+            --accent: #ec4899;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-900: #111827;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--gray-50);
+            color: var(--gray-900);
+        }
+
         /* Header */
         header {
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
