@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skincare & Wellness Tracker - v10</title>
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding-bottom: 100px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            padding-top: 20px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow-x: auto;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .nav-tab {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            background: #f0f0f0;
+            color: #333;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .nav-tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .nav-tab:hover:not(.active) {
+            background: #e0e0e0;
+        }
+
+        .content-section {
+            display: none;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-title {
+            font-size: 22px;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-success {
+            background: #51cf66;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #40c057;
+        }
+
+        .btn-danger {
+            background: #ff6b6b;
+            color: white;
+            padding: 8px 16px;
+            font-size: 13px;
+        }
+
+        .btn-danger:hover {
+            background: #ff5252;
+        }
+
+        .card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 0%);
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 15px;
+        }
+
+        .card h3 {
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .card p {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .imc-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .imc-normal {
+            background: #d4f4dd;
+            color: #1e7e34;
+        }
+
+        .imc-overweight {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .imc-obese {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .imc-underweight {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 14px;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .no-data {
+            text-align: center;
+            color: #999;
+            padding: 40px 20px;
+            font-size: 14px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin: 25px 0;
+        }
+
+        .auth-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .auth-box {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .auth-box h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .btn-logout {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 18px;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            z-index: 1000;
+        }
+
+        .btn-logout:hover {
+            background: #ff5252;
+        }
+
+        .measurements-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .measurements-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .measurement-card {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .measurement-card label {
+            display: block;
+            font-weight: 600;
+            color: #666;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+        }
+
+        .measurement-card input {
+            width: 100% !important;
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+
+        .goal-card {
+            background: #f0f4ff;
+            border-left: 4px solid #667eea;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .goal-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .goal-stat {
+            text-align: center;
+            padding: 10px;
+            background: white;
+            border-radius: 6px;
+        }
+
+        .goal-stat-label {
+            font-size: 11px;
+            color: #999;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .goal-stat-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+    </style>
+</head>
+<body>
+    <div id="authContainer" class="auth-container" style="display: none;">
+        <div class="auth-box">
+            <h2>🧴 Skincare & Wellness Tracker</h2>
+            <div id="authError" style="color: #ff6b6b; margin-bottom: 15px; font-size: 14px;"></div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="authEmail" placeholder="seu@email.com">
+            </div>
+            <div class="form-group">
+                <label>Senha</label>
+                <input type="password" id="authPassword" placeholder="sua senha">
+            </div>
+            <button class="btn btn-primary" style="width: 100%;" onclick="login()">Entrar</button>
+            <p style="text-align: center; margin-top: 15px; font-size: 13px; color: #666;">
+                Não tem conta? <a href="#" onclick="toggleRegister()" style="color: #667eea; cursor: pointer;">Registre-se</a>
+            </p>
+            <button class="btn btn-secondary" id="registerBtn" style="width: 100%; display: none; margin-top: 10px;" onclick="register()">Criar Conta</button>
+        </div>
+    </div>
+
+    <div id="appContainer" style="display: none;">
+        <button class="btn-logout" onclick="logout()">Sair</button>
+
+        <div class="container">
+            <div class="header">
+                <h1>🧴 Skincare & Wellness</h1>
+                <p id="userEmail"></p>
+            </div>
+
+            <div class="nav-tabs">
+                <button class="nav-tab active" onclick="showSection('rotina')">📅 Rotina</button>
+                <button class="nav-tab" onclick="showSection('peptideos')">💉 Peptídeos</button>
+                <button class="nav-tab" onclick="showSection('calculadora')">🧮 Calculadora</button>
+                <button class="nav-tab" onclick="showSection('peso-medidas')">⚖️ Peso & Medidas</button>
+                <button class="nav-tab" onclick="showSection('pesquisa')">🔍 Pesquisar</button>
+            </div>
+
+            <!-- Seção: Peso & Medidas -->
+            <div id="peso-medidas" class="content-section">
+                <h2 class="section-title">⚖️ Peso & Medidas Corporais</h2>
+
+                <div class="form-group">
+                    <label>Sua Altura (cm)</label>
+                    <input type="number" id="altura" placeholder="Ex: 165" min="100" max="250" step="0.1">
+                    <small style="color: #999; font-size: 12px; margin-top: 5px;">Necessária para cálculo do IMC</small>
+                </div>
+
+                <div class="form-group">
+                    <label>Peso Atual (kg)</label>
+                    <input type="number" id="peso" placeholder="Ex: 65.5" min="20" max="300" step="0.1">
+                </div>
+
+                <div class="form-group">
+                    <label>Data</label>
+                    <input type="date" id="pesoDta">
+                </div>
+
+                <button class="btn btn-primary" onclick="registrarPeso()">Registrar Peso</button>
+
+                <!-- Metas de Peso -->
+                <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #e0e0e0;">
+                    <h3 style="font-size: 18px; color: #333; margin-bottom: 15px;">🎯 Sua Meta</h3>
+
+                    <div class="goal-card">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label>Peso Alvo (kg)</label>
+                                <input type="number" id="pesoAlvo" placeholder="Ex: 60" min="20" max="300" step="0.1">
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label>Peso Inicial (kg)</label>
+                                <input type="number" id="pesoInicial" placeholder="Ex: 70" min="20" max="300" step="0.1">
+                            </div>
+                        </div>
+                        <button class="btn btn-success" onclick="salvarMeta()" style="width: 100%; margin-top: 12px;">💾 Salvar Meta</button>
+                    </div>
+
+                    <div id="goalProgress" style="display: none;">
+                        <div class="card">
+                            <h3>📈 Seu Progresso</h3>
+                            <div class="goal-info">
+                                <div class="goal-stat">
+                                    <div class="goal-stat-label">Perdido</div>
+                                    <div class="goal-stat-value" id="goalPerdido">0 kg</div>
+                                </div>
+                                <div class="goal-stat">
+                                    <div class="goal-stat-label">Faltam</div>
+                                    <div class="goal-stat-value" id="goalFaltam">0 kg</div>
+                                </div>
+                                <div class="goal-stat">
+                                    <div class="goal-stat-label">Progresso</div>
+                                    <div class="goal-stat-value" id="goalPercent">0%</div>
+                                </div>
+                            </div>
+                            <div style="margin-top: 15px;">
+                                <small style="color: #999;">Barra de progresso</small>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="goalBar" style="width: 0%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resumo de IMC -->
+                <div id="imcResumo" style="margin-top: 30px; display: none;">
+                    <div class="card">
+                        <h3>📊 Seu IMC Atual</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
+                            <div>
+                                <p style="color: #999; font-size: 12px; margin-bottom: 5px;">Peso</p>
+                                <div class="stat-value" id="pesoAtual">--</div>
+                            </div>
+                            <div>
+                                <p style="color: #999; font-size: 12px; margin-bottom: 5px;">IMC</p>
+                                <div class="stat-value" id="imcValor">--</div>
+                            </div>
+                        </div>
+                        <div id="imcStatus" style="margin-top: 15px;"></div>
+                    </div>
+                </div>
+
+                <!-- Gráfico de Peso com Média Móvel -->
+                <div id="chartContainer" class="chart-container" style="margin-top: 30px; display: none;">
+                    <canvas id="pesoChart"></canvas>
+                </div>
+
+                <!-- Medidas Corporais -->
+                <div style="margin-top: 35px;">
+                    <h3 class="section-title" style="margin-top: 30px;">📏 Medidas Corporais</h3>
+
+                    <div class="measurements-grid">
+                        <div class="measurement-card">
+                            <label for="medidaPeito">Peito (cm)</label>
+                            <input type="number" id="medidaPeito" placeholder="--" min="0" max="300" step="0.1">
+                        </div>
+                        <div class="measurement-card">
+                            <label for="medidaCintura">Cintura (cm)</label>
+                            <input type="number" id="medidaCintura" placeholder="--" min="0" max="300" step="0.1">
+                        </div>
+                        <div class="measurement-card">
+                            <label for="medidaQuadril">Quadril (cm)</label>
+                            <input type="number" id="medidaQuadril" placeholder="--" min="0" max="300" step="0.1">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Data das Medidas</label>
+                        <input type="date" id="medidasData">
+                    </div>
+
+                    <button class="btn btn-primary" onclick="registrarMedidas()">Salvar Medidas</button>
+                </div>
+
+                <!-- Histórico com Exportar -->
+                <div class="table-container" style="margin-top: 30px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h3 style="font-size: 18px; color: #333;">📋 Histórico</h3>
+                        <button class="btn btn-success" onclick="exportarCSV()" style="padding: 8px 16px; font-size: 13px;">📥 Exportar CSV</button>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Peso (kg)</th>
+                                <th>IMC</th>
+                                <th>Peito</th>
+                                <th>Cintura</th>
+                                <th>Quadril</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="pesoHistorico">
+                            <tr><td colspan="7" class="no-data">Nenhum registro ainda</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Outras seções -->
+            <div id="rotina" class="content-section active">
+                <h2 class="section-title">📅 Rotina Diária</h2>
+                <p style="color: #999;">Seção de rotina diária - em breve com funcionalidades expandidas</p>
+            </div>
+
+            <div id="peptideos" class="content-section">
+                <h2 class="section-title">💉 Peptídeos Injetáveis</h2>
+                <p style="color: #999;">Seção de peptídeos - em breve com funcionalidades expandidas</p>
+            </div>
+
+            <div id="calculadora" class="content-section">
+                <h2 class="section-title">🧮 Calculadora de Doses</h2>
+                <p style="color: #999;">Seção de calculadora - em breve com funcionalidades expandidas</p>
+            </div>
+
+            <div id="pesquisa" class="content-section">
+                <h2 class="section-title">🔍 Pesquisar</h2>
+                <p style="color: #999;">Seção de pesquisa - em breve com funcionalidades expandidas</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBJeJ2S_mKEfxLYrRz5X7Q-qZrS9t_6x0k",
+            authDomain: "skincare-traker.firebaseapp.com",
+            databaseURL: "https://skincare-traker-default-rtdb.firebaseio.com",
+            projectId: "skincare-traker",
+            storageBucket: "skincare-traker.appspot.com",
+            messagingSenderId: "1067637563607",
+            appId: "1:1067637563607:web:5f4c82f34e6e9e8b74eb16"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
+
+        let currentUser = null;
+        let pesoChart = null;
+        let registrosPeso = [];
+        let metaAtual = {};
+
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                currentUser = user;
+                document.getElementById('authContainer').style.display = 'none';
+                document.getElementById('appContainer').style.display = 'block';
+                document.getElementById('userEmail').textContent = user.email;
+                carregarDados();
+                setDataAtual();
+            } else {
+                currentUser = null;
+                document.getElementById('authContainer').style.display = 'flex';
+                document.getElementById('appContainer').style.display = 'none';
+            }
+        });
+
+        function login() {
+            const email = document.getElementById('authEmail').value;
+            const password = document.getElementById('authPassword').value;
+            auth.signInWithEmailAndPassword(email, password).catch(err => {
+                document.getElementById('authError').textContent = err.message;
+            });
+        }
+
+        function register() {
+            const email = document.getElementById('authEmail').value;
+            const password = document.getElementById('authPassword').value;
+            if (password.length < 6) {
+                document.getElementById('authError').textContent = 'Senha deve ter pelo menos 6 caracteres';
+                return;
+            }
+            auth.createUserWithEmailAndPassword(email, password).catch(err => {
+                document.getElementById('authError').textContent = err.message;
+            });
+        }
+
+        function toggleRegister() {
+            document.getElementById('registerBtn').style.display =
+                document.getElementById('registerBtn').style.display === 'none' ? 'block' : 'none';
+        }
+
+        function logout() {
+            auth.signOut();
+        }
+
+        function showSection(sectionId) {
+            document.querySelectorAll('.content-section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            event.target.classList.add('active');
+
+            if (sectionId === 'peso-medidas') {
+                setTimeout(() => {
+                    if (pesoChart) pesoChart.resize();
+                }, 100);
+            }
+        }
+
+        function setDataAtual() {
+            const hoje = new Date().toISOString().split('T')[0];
+            document.getElementById('pesoDta').value = hoje;
+            document.getElementById('medidasData').value = hoje;
+        }
+
+        function registrarPeso() {
+            const altura = parseFloat(document.getElementById('altura').value);
+            const peso = parseFloat(document.getElementById('peso').value);
+            const data = document.getElementById('pesoDta').value;
+
+            if (!altura || !peso || !data) {
+                alert('Preencha altura, peso e data');
+                return;
+            }
+
+            if (!currentUser) return;
+
+            const novoRegistro = {
+                data: data,
+                peso: peso,
+                altura: altura,
+                timestamp: new Date().getTime()
+            };
+
+            db.ref(`users/${currentUser.uid}/peso_registros`).push(novoRegistro)
+                .then(() => {
+                    document.getElementById('peso').value = '';
+                    setDataAtual();
+                    carregarDados();
+                })
+                .catch(err => console.error('Erro ao registrar peso:', err));
+        }
+
+        function registrarMedidas() {
+            const peito = parseFloat(document.getElementById('medidaPeito').value);
+            const cintura = parseFloat(document.getElementById('medidaCintura').value);
+            const quadril = parseFloat(document.getElementById('medidaQuadril').value);
+            const data = document.getElementById('medidasData').value;
+
+            if (!data) {
+                alert('Preencha a data');
+                return;
+            }
+
+            if (!currentUser) return;
+
+            const novoRegistro = {
+                data: data,
+                peito: peito || null,
+                cintura: cintura || null,
+                quadril: quadril || null,
+                timestamp: new Date().getTime()
+            };
+
+            db.ref(`users/${currentUser.uid}/medidas_registros`).push(novoRegistro)
+                .then(() => {
+                    document.getElementById('medidaPeito').value = '';
+                    document.getElementById('medidaCintura').value = '';
+                    document.getElementById('medidaQuadril').value = '';
+                    setDataAtual();
+                    carregarDados();
+                })
+                .catch(err => console.error('Erro ao registrar medidas:', err));
+        }
+
+        function salvarMeta() {
+            const pesoAlvo = parseFloat(document.getElementById('pesoAlvo').value);
+            const pesoInicial = parseFloat(document.getElementById('pesoInicial').value);
+
+            if (!pesoAlvo || !pesoInicial) {
+                alert('Preencha peso inicial e peso alvo');
+                return;
+            }
+
+            if (!currentUser) return;
+
+            metaAtual = {
+                pesoAlvo: pesoAlvo,
+                pesoInicial: pesoInicial,
+                dataCriacao: new Date().getTime()
+            };
+
+            db.ref(`users/${currentUser.uid}/meta_peso`).set(metaAtual)
+                .then(() => {
+                    alert('Meta salva com sucesso!');
+                    atualizarProgresso();
+                })
+                .catch(err => console.error('Erro ao salvar meta:', err));
+        }
+
+        function carregarDados() {
+            if (!currentUser) return;
+
+            // Carregar meta de peso
+            db.ref(`users/${currentUser.uid}/meta_peso`).on('value', (snapshot) => {
+                if (snapshot.exists()) {
+                    metaAtual = snapshot.val();
+                    document.getElementById('pesoAlvo').value = metaAtual.pesoAlvo;
+                    document.getElementById('pesoInicial').value = metaAtual.pesoInicial;
+                    document.getElementById('goalProgress').style.display = 'block';
+                    atualizarProgresso();
+                }
+            });
+
+            // Carregar registros de peso
+            db.ref(`users/${currentUser.uid}/peso_registros`).on('value', (snapshot) => {
+                registrosPeso = [];
+                if (snapshot.exists()) {
+                    snapshot.forEach((child) => {
+                        registrosPeso.push(child.val());
+                    });
+                }
+                registrosPeso.sort((a, b) => new Date(a.data) - new Date(b.data));
+                atualizarHistoricoPeso();
+                atualizarGraficoPeso();
+                atualizarResumoIMC();
+                atualizarProgresso();
+            });
+        }
+
+        function atualizarProgresso() {
+            if (registrosPeso.length === 0 || Object.keys(metaAtual).length === 0) {
+                document.getElementById('goalProgress').style.display = 'none';
+                return;
+            }
+
+            document.getElementById('goalProgress').style.display = 'block';
+            const ultimo = registrosPeso[registrosPeso.length - 1];
+            const pesoAtual = ultimo.peso;
+            const pesoAlvo = metaAtual.pesoAlvo;
+            const pesoInicial = metaAtual.pesoInicial;
+
+            const totalAPerder = pesoInicial - pesoAlvo;
+            const jaPerdeu = pesoInicial - pesoAtual;
+            const aindaFalta = pesoAtual - pesoAlvo;
+            const percentual = totalAPerder > 0 ? (jaPerdeu / totalAPerder * 100) : 0;
+
+            document.getElementById('goalPerdido').textContent = jaPerdeu.toFixed(1) + ' kg';
+            document.getElementById('goalFaltam').textContent = Math.max(0, aindaFalta).toFixed(1) + ' kg';
+            document.getElementById('goalPercent').textContent = Math.min(100, percentual).toFixed(0) + '%';
+            document.getElementById('goalBar').style.width = Math.min(100, percentual) + '%';
+        }
+
+        function atualizarResumoIMC() {
+            if (registrosPeso.length === 0) {
+                document.getElementById('imcResumo').style.display = 'none';
+                return;
+            }
+
+            document.getElementById('imcResumo').style.display = 'block';
+            const ultimo = registrosPeso[registrosPeso.length - 1];
+            const imc = (ultimo.peso / (ultimo.altura / 100) ** 2).toFixed(1);
+
+            document.getElementById('pesoAtual').textContent = `${ultimo.peso} kg`;
+            document.getElementById('imcValor').textContent = imc;
+
+            let status = '';
+            let classe = '';
+
+            if (imc < 18.5) {
+                status = 'Abaixo do peso';
+                classe = 'imc-underweight';
+            } else if (imc < 25) {
+                status = 'Peso normal';
+                classe = 'imc-normal';
+            } else if (imc < 30) {
+                status = 'Sobrepeso';
+                classe = 'imc-overweight';
+            } else {
+                status = 'Obesidade';
+                classe = 'imc-obese';
+            }
+
+            document.getElementById('imcStatus').innerHTML =
+                `<div class="imc-badge ${classe}">${status}</div>`;
+        }
+
+        function calcularMediaMovel(dados, janela = 7) {
+            const resultado = [];
+            for (let i = 0; i < dados.length; i++) {
+                const inicio = Math.max(0, i - janela + 1);
+                const fatia = dados.slice(inicio, i + 1);
+                const media = fatia.reduce((a, b) => a + b, 0) / fatia.length;
+                resultado.push(parseFloat(media.toFixed(1)));
+            }
+            return resultado;
+        }
+
+        function atualizarGraficoPeso() {
+            if (registrosPeso.length === 0) {
+                document.getElementById('chartContainer').style.display = 'none';
+                return;
+            }
+
+            document.getElementById('chartContainer').style.display = 'block';
+
+            const labels = registrosPeso.map(r => r.data);
+            const dados = registrosPeso.map(r => r.peso);
+            const mediaMovel = calcularMediaMovel(dados, 7);
+
+            const ctx = document.getElementById('pesoChart').getContext('2d');
+
+            if (pesoChart) {
+                pesoChart.destroy();
+            }
+
+            pesoChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Peso (kg)',
+                            data: dados,
+                            borderColor: '#667eea',
+                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 4,
+                            pointBackgroundColor: '#667eea',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                        },
+                        {
+                            label: 'Média Móvel (7 dias)',
+                            data: mediaMovel,
+                            borderColor: '#ff922b',
+                            backgroundColor: 'transparent',
+                            borderWidth: 3,
+                            fill: false,
+                            tension: 0.4,
+                            borderDash: [5, 5],
+                            pointRadius: 0,
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            labels: {
+                                font: { size: 13 },
+                                padding: 15
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + ' kg';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function atualizarHistoricoPeso() {
+            const tbody = document.getElementById('pesoHistorico');
+
+            if (registrosPeso.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="no-data">Nenhum registro ainda</td></tr>';
+                return;
+            }
+
+            db.ref(`users/${currentUser.uid}/medidas_registros`).once('value', (snapshot) => {
+                const medidas = {};
+                if (snapshot.exists()) {
+                    snapshot.forEach((child) => {
+                        medidas[child.val().data] = child.val();
+                    });
+                }
+
+                tbody.innerHTML = registrosPeso.map(reg => {
+                    const imc = (reg.peso / (reg.altura / 100) ** 2).toFixed(1);
+                    const med = medidas[reg.data] || {};
+
+                    return `
+                        <tr>
+                            <td>${new Date(reg.data).toLocaleDateString('pt-BR')}</td>
+                            <td><strong>${reg.peso}</strong></td>
+                            <td>${imc}</td>
+                            <td>${med.peito ? med.peito : '--'}</td>
+                            <td>${med.cintura ? med.cintura : '--'}</td>
+                            <td>${med.quadril ? med.quadril : '--'}</td>
+                            <td>
+                                <button class="btn btn-danger" onclick="deletarRegistro('${reg.timestamp}')">X</button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            });
+        }
+
+        function deletarRegistro(timestamp) {
+            if (!confirm('Tem certeza que quer deletar este registro?')) return;
+
+            if (!currentUser) return;
+
+            db.ref(`users/${currentUser.uid}/peso_registros`).orderByChild('timestamp')
+                .equalTo(timestamp).once('value', (snapshot) => {
+                    snapshot.forEach((child) => {
+                        child.ref.remove();
+                    });
+                });
+        }
+
+        function exportarCSV() {
+            if (registrosPeso.length === 0) {
+                alert('Nenhum dado para exportar');
+                return;
+            }
+
+            let csv = 'Data,Peso (kg),Altura (cm),IMC,Peito (cm),Cintura (cm),Quadril (cm)\n';
+
+            db.ref(`users/${currentUser.uid}/medidas_registros`).once('value', (snapshot) => {
+                const medidas = {};
+                if (snapshot.exists()) {
+                    snapshot.forEach((child) => {
+                        medidas[child.val().data] = child.val();
+                    });
+                }
+
+                registrosPeso.forEach(reg => {
+                    const imc = (reg.peso / (reg.altura / 100) ** 2).toFixed(2);
+                    const med = medidas[reg.data] || {};
+                    const peito = med.peito ? med.peito : '';
+                    const cintura = med.cintura ? med.cintura : '';
+                    const quadril = med.quadril ? med.quadril : '';
+
+                    csv += `${reg.data},${reg.peso},${reg.altura},${imc},${peito},${cintura},${quadril}\n`;
+                });
+
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `peso_medidas_${new Date().toISOString().split('T')[0]}.csv`;
+                a.click();
+                window.URL.revokeObjectURL(url);
+            });
+        }
+    </script>
+</body>
+</html>
