@@ -637,6 +637,7 @@
         };
 
         let auth, db;
+        let firebaseReady = false;
 
         // Wait for Firebase to be defined before initializing
         function initializeFirebase() {
@@ -649,17 +650,13 @@
             firebase.initializeApp(firebaseConfig);
             auth = firebase.auth();
             db = firebase.database();
+            firebaseReady = true;
             console.log('Firebase inicializado com sucesso!');
+            setupAuthListener();
         }
 
-        initializeFirebase();
-
-        let currentUser = null;
-        let pesoChart = null;
-        let registrosPeso = [];
-        let metaAtual = {};
-
-        auth.onAuthStateChanged((user) => {
+        function setupAuthListener() {
+            auth.onAuthStateChanged((user) => {
             if (user) {
                 currentUser = user;
                 document.getElementById('authContainer').style.display = 'none';
@@ -673,8 +670,14 @@
                 document.getElementById('appContainer').style.display = 'none';
             }
         });
+        }
 
-        function login() {
+        let currentUser = null;
+        let pesoChart = null;
+        let registrosPeso = [];
+        let metaAtual = {};
+
+        initializeFirebase();
             const email = document.getElementById('authEmail').value;
             const password = document.getElementById('authPassword').value;
             auth.signInWithEmailAndPassword(email, password).catch(err => {
