@@ -678,6 +678,8 @@
         let metaAtual = {};
 
         initializeFirebase();
+
+        function login() {
             const email = document.getElementById('authEmail').value;
             const password = document.getElementById('authPassword').value;
             auth.signInWithEmailAndPassword(email, password).catch(err => {
