@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Skincare & Wellness Tracker - v10</title>
-    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * {
@@ -636,9 +636,23 @@
             appId: "1:1067637563607:web:5f4c82f34e6e9e8b74eb16"
         };
 
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.database();
+        let auth, db;
+
+        // Wait for Firebase to be defined before initializing
+        function initializeFirebase() {
+            if (typeof firebase === 'undefined') {
+                console.log('Firebase ainda não foi carregado, tentando novamente em 100ms...');
+                setTimeout(initializeFirebase, 100);
+                return;
+            }
+
+            firebase.initializeApp(firebaseConfig);
+            auth = firebase.auth();
+            db = firebase.database();
+            console.log('Firebase inicializado com sucesso!');
+        }
+
+        initializeFirebase();
 
         let currentUser = null;
         let pesoChart = null;
