@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skincare & Peptídeos - Tracker v12</title>
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #7c3aed;
+            --secondary: #ec4899;
+            --accent: #06b6d4;
+            --bg-light: #f9fafb;
+            --bg-card: #ffffff;
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+            --border: #e5e7eb;
+            --success: #10b981;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-light: #111827;
+                --bg-card: #1f2937;
+                --text-dark: #f9fafb;
+                --text-light: #d1d5db;
+                --border: #374151;
+            }
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+            padding: 20px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        h1 { font-size: 2em; color: var(--primary); }
+        .menu {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            border-bottom: 2px solid var(--border);
+        }
+        .menu-button {
+            padding: 12px 20px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 0.95em;
+            color: var(--text-light);
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        .menu-button:hover { color: var(--primary); }
+        .menu-button.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+        .tab-content { display: none; animation: fadeIn 0.3s; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .card h2 { color: var(--primary); margin-bottom: 15px; }
+        .card h3 { color: var(--primary); margin: 20px 0 10px 0; }
+        .input-group { margin-bottom: 15px; }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--bg-light);
+            color: var(--text-dark);
+            font-family: inherit;
+        }
+        button {
+            padding: 10px 20px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        button:hover { background: var(--secondary); }
+        .btn-logout {
+            background: var(--secondary);
+            padding: 8px 16px;
+            font-size: 0.9em;
+        }
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .checkbox-item input { width: auto; }
+        .peptide-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        .peptide-item {
+            background: var(--bg-light);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+        }
+        .peptide-item strong { color: var(--primary); }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th {
+            background: var(--primary);
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+        td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+        .auth-container {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 30px;
+            background: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+        .auth-container h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+        .weight-chart { max-width: 100%; height: 300px; margin: 20px 0; }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            background: var(--bg-light);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border-left: 4px solid var(--primary);
+        }
+        .stat-value { font-size: 1.5em; font-weight: bold; color: var(--primary); }
+        .stat-label { font-size: 0.9em; color: var(--text-light); margin-top: 5px; }
+        .tabs-pesquisa {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            border-bottom: 2px solid var(--border);
+        }
+        .tab-pesquisa-button {
+            padding: 10px 16px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 0.9em;
+            color: var(--text-light);
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        .tab-pesquisa-button:hover { color: var(--primary); }
+        .tab-pesquisa-button.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+        .pesquisa-content { display: none; }
+        .pesquisa-content.active { display: block; }
+        .peptide-card {
+            border-left: 4px solid var(--primary);
+            padding: 20px;
+            margin-bottom: 20px;
+            background: var(--bg-card);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+        .mechanism {
+            background: var(--bg-light);
+            padding: 12px;
+            border-radius: 6px;
+            margin: 10px 0;
+        }
+        .study-reference {
+            background: var(--bg-light);
+            padding: 10px;
+            border-left: 3px solid var(--accent);
+            margin: 10px 0;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: 600;
+            margin: 4px 4px 4px 0;
+        }
+        .badge-green { background: #d1fae5; color: #065f46; }
+        .badge-blue { background: #dbeafe; color: #1e40af; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="app-container" style="display: none;">
+            <header>
+                <div>
+                    <h1>🧴 Skincare & Peptídeos</h1>
+                </div>
+                <button class="btn-logout" onclick="logout()">Logout</button>
+            </header>
+
+            <div class="menu">
+                <button class="menu-button active" onclick="switchMenu('rotina')">📅 Rotina Diária</button>
+                <button class="menu-button" onclick="switchMenu('peptideos')">💉 Peptídeos</button>
+                <button class="menu-button" onclick="switchMenu('calculadora')">🧮 Calculadora</button>
+                <button class="menu-button" onclick="switchMenu('peso')">⚖️ Peso</button>
+                <button class="menu-button" onclick="switchMenu('pesquisas')">🔍 Estudos</button>
+            </div>
+
+            <!-- ABA 1: ROTINA DIÁRIA -->
+            <div id="rotina" class="tab-content active">
+                <div class="card">
+                    <h2>📅 Rotina Diária</h2>
+                    <div class="input-group">
+                        <label>Manhã - Produtos:</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="principia-mix-manha"> Principia Mix-02
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="principia-pm-manha"> Principia PM-10
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="principia-vc-manha"> Principia VC-10
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="ghkcu-topico-manha"> GHK-Cu Tópico
+                            </label>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>Noite - Produtos:</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="principia-cm-noite"> Principia CM-01
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="retinol-noite"> Creomy Retinol 0.3%
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="tonico-noite"> Fisiotratha Tônico
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="principia-al-noite"> Principia AL-10
+                            </label>
+                        </div>
+                    </div>
+                    <button onclick="saveRotina()">Salvar Rotina</button>
+                </div>
+            </div>
+
+            <!-- ABA 2: PEPTÍDEOS INJETÁVEIS -->
+            <div id="peptideos" class="tab-content">
+                <div class="card">
+                    <h2>💉 Peptídeos Injetáveis</h2>
+                    <div class="input-group">
+                        <label>Peptídeo:</label>
+                        <select id="peptideo-select">
+                            <option value="">Selecionar...</option>
+                            <option value="BPC-157">BPC-157</option>
+                            <option value="TB-500">TB-500</option>
+                            <option value="KPV">KPV</option>
+                            <option value="GHK-Cu">GHK-Cu</option>
+                            <option value="Colágeno">Colágeno</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Dose (mg):</label>
+                        <input type="number" id="dose-valor" placeholder="Ex: 1.5">
+                    </div>
+                    <div class="input-group">
+                        <label>Data de Aplicação:</label>
+                        <input type="date" id="data-aplicacao">
+                    </div>
+                    <div class="input-group">
+                        <label>Observações:</label>
+                        <textarea id="obs-peptideo" placeholder="Local, reação, notas..." rows="3"></textarea>
+                    </div>
+                    <button onclick="savePeptideo()">Registrar Aplicação</button>
+
+                    <h3 style="margin-top: 30px;">Histórico de Aplicações</h3>
+                    <div id="peptideo-history" class="peptide-list"></div>
+                </div>
+            </div>
+
+            <!-- ABA 3: CALCULADORA DE DOSES -->
+            <div id="calculadora" class="tab-content">
+                <div class="card">
+                    <h2>🧮 Calculadora de Doses</h2>
+                    <div class="input-group">
+                        <label>Peso corporal (kg):</label>
+                        <input type="number" id="peso-calc" placeholder="Ex: 65">
+                    </div>
+                    <div class="input-group">
+                        <label>Peptídeo:</label>
+                        <select id="peptideo-calc">
+                            <option value="">Selecionar...</option>
+                            <option value="BPC-157">BPC-157 (250-500 mcg/semana)</option>
+                            <option value="TB-500">TB-500 (1-2.5 mg/semana)</option>
+                            <option value="KPV">KPV (100-500 mcg/dia)</option>
+                            <option value="GHK-Cu">GHK-Cu (1-2 mg/dia ciclos)</option>
+                        </select>
+                    </div>
+                    <button onclick="calcularDose()">Calcular Recomendação</button>
+                    <div id="resultado-calc" style="margin-top: 20px;"></div>
+                </div>
+            </div>
+
+            <!-- ABA 4: PESO & MEDIDAS -->
+            <div id="peso" class="tab-content">
+                <div class="card">
+                    <h2>⚖️ Rastreamento de Peso</h2>
+                    <div class="input-group">
+                        <label>Peso (kg):</label>
+                        <input type="number" step="0.1" id="peso-entrada" placeholder="Ex: 65.5">
+                    </div>
+                    <div class="input-group">
+                        <label>Altura (cm):</label>
+                        <input type="number" id="altura-entrada" placeholder="Ex: 170">
+                    </div>
+                    <div class="input-group">
+                        <label>Data:</label>
+                        <input type="date" id="data-peso">
+                    </div>
+                    <button onclick="savePeso()">Registrar Peso</button>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value" id="imc-valor">—</div>
+                            <div class="stat-label">IMC</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="peso-atual">—</div>
+                            <div class="stat-label">Peso Atual</div>
+                        </div>
+                    </div>
+
+                    <canvas class="weight-chart" id="weightChart"></canvas>
+                    <table>
+                        <thead>
+                            <tr><th>Data</th><th>Peso</th><th>Altura</th><th>IMC</th></tr>
+                        </thead>
+                        <tbody id="peso-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ABA 5: PESQUISAS & ESTUDOS -->
+            <div id="pesquisas" class="tab-content">
+                <div class="card">
+                    <h2>🔍 Base de Conhecimento - Peptídeos</h2>
+                    <div class="tabs-pesquisa">
+                        <button class="tab-pesquisa-button active" onclick="switchPesquisa('peptideos-lista')">📋 Peptídeos</button>
+                        <button class="tab-pesquisa-button" onclick="switchPesquisa('mecanismos')">⚙️ Mecanismos</button>
+                        <button class="tab-pesquisa-button" onclick="switchPesquisa('sinergias')">🤝 Sinergias</button>
+                        <button class="tab-pesquisa-button" onclick="switchPesquisa('protocolo')">📅 Protocolo</button>
+                        <button class="tab-pesquisa-button" onclick="switchPesquisa('referencias')">📚 Referências</button>
+                    </div>
+
+                    <!-- PEPTÍDEOS -->
+                    <div id="peptideos-lista" class="pesquisa-content active">
+                        <div class="peptide-card">
+                            <h3>1️⃣ BPC-157 <span class="badge badge-blue">8.5/10</span></h3>
+                            <p><strong>Tipo:</strong> Pentadecapeptídeo | <strong>Origem:</strong> Suco gástrico</p>
+                            <div class="mechanism">
+                                <strong>🔬 Mecanismos:</strong>
+                                <ul style="margin-left: 15px; margin-top: 5px;">
+                                    <li>Estimula angiogênese (VEGF)</li>
+                                    <li>Ativa fator de crescimento EGF</li>
+                                    <li>Modula óxido nítrico (NO)</li>
+                                </ul>
+                            </div>
+                            <div class="study-reference">
+                                <strong>Sikiric P et al., 2018</strong> | Curr Pharm Des<br>
+                                Aceleração 40-60% em cicatrização de tendões
+                            </div>
+                            <p style="margin-top: 10px;">
+                                <span class="badge badge-green">✓ Tendões</span>
+                                <span class="badge badge-green">✓ Intestino</span>
+                                <span class="badge badge-green">✓ Músculos</span>
+                            </p>
+                        </div>
+
+                        <div class="peptide-card">
+                            <h3>2️⃣ TB-500 <span class="badge badge-blue">7.5/10</span></h3>
+                            <p><strong>Tipo:</strong> Timosina Beta-4 | <strong>Origem:</strong> Proteína 43 aminoácidos</p>
+                            <div class="mechanism">
+                                <strong>🔬 Mecanismos:</strong>
+                                <ul style="margin-left: 15px; margin-top: 5px;">
+                                    <li>Regulação da actina (citoesqueleto)</li>
+                                    <li>Promoção migração celular</li>
+                                    <li>Angiogênese e redução inflamação</li>
+                                </ul>
+                            </div>
+                            <div class="study-reference">
+                                <strong>Malinda KM et al., 1999</strong> | J Invest Dermatol<br>
+                                Aceleração 40% em fechamento de feridas
+                            </div>
+                            <p style="margin-top: 10px;">
+                                <span class="badge badge-green">✓ Cicatrização</span>
+                                <span class="badge badge-green">✓ Coração</span>
+                            </p>
+                        </div>
+
+                        <div class="peptide-card">
+                            <h3>3️⃣ KPV <span class="badge badge-blue">7/10</span></h3>
+                            <p><strong>Tipo:</strong> Tripeptídeo (Lys-Pro-Val)</p>
+                            <div class="mechanism">
+                                <strong>🔬 Mecanismos:</strong>
+                                <ul style="margin-left: 15px; margin-top: 5px;">
+                                    <li>Inibição NF-kB (inflamação)</li>
+                                    <li>Redução citocinas pró-inflamatórias</li>
+                                    <li>Proteção barreira intestinal</li>
+                                </ul>
+                            </div>
+                            <div class="study-reference">
+                                <strong>Brzoska T et al., 2008</strong> | Endocr Rev<br>
+                                Redução inflamação em colite
+                            </div>
+                            <p style="margin-top: 10px;">
+                                <span class="badge badge-green">✓ DII</span>
+                                <span class="badge badge-green">✓ Inflamação</span>
+                            </p>
+                        </div>
+
+                        <div class="peptide-card">
+                            <h3>4️⃣ GHK-Cu <span class="badge badge-blue">8/10</span></h3>
+                            <p><strong>Tipo:</strong> Tripeptídeo + cobre</p>
+                            <div class="mechanism">
+                                <strong>🔬 Mecanismos:</strong>
+                                <ul style="margin-left: 15px; margin-top: 5px;">
+                                    <li>Síntese de colágeno</li>
+                                    <li>Modulação 4000+ genes</li>
+                                    <li>Antioxidante potente</li>
+                                </ul>
+                            </div>
+                            <div class="study-reference">
+                                <strong>Pickart L et al., 2012</strong> | J Cosmet Sci<br>
+                                Supera Vitamina C em estimulação de colágeno
+                            </div>
+                            <p style="margin-top: 10px;">
+                                <span class="badge badge-green">✓ Pele</span>
+                                <span class="badge badge-green">✓ Regeneração</span>
+                            </p>
+                        </div>
+
+                        <div class="peptide-card">
+                            <h3>5️⃣ Colágeno Hidrolisado <span class="badge badge-blue">8.5/10</span></h3>
+                            <p><strong>Tipo:</strong> Di/tripeptídeos</p>
+                            <div class="mechanism">
+                                <strong>🔬 Mecanismos:</strong>
+                                <ul style="margin-left: 15px; margin-top: 5px;">
+                                    <li>Estimulação de fibroblastos</li>
+                                    <li>Sinal matrikine</li>
+                                    <li>Suporte matriz extracelular</li>
+                                </ul>
+                            </div>
+                            <div class="study-reference">
+                                <strong>Garcia-Coronado JM et al., 2019</strong> | Int J Med Sci<br>
+                                10g/dia reduz dor articular em OA
+                            </div>
+                            <p style="margin-top: 10px;">
+                                <span class="badge badge-green">✓ Articulações</span>
+                                <span class="badge badge-green">✓ Tendões</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- MECANISMOS -->
+                    <div id="mecanismos" class="pesquisa-content">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Peptídeo</th>
+                                    <th>Mecanismo</th>
+                                    <th>Melhor Para</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>BPC-157</strong></td>
+                                    <td>VEGF, EGF, NO</td>
+                                    <td>Tendões, intestino</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>TB-500</strong></td>
+                                    <td>Actina, migração</td>
+                                    <td>Cicatrização, coração</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>KPV</strong></td>
+                                    <td>Inibição NF-kB</td>
+                                    <td>Inflamação, artrite</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>GHK-Cu</strong></td>
+                                    <td>Modulação gênica</td>
+                                    <td>Regeneração, pele</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Colágeno</strong></td>
+                                    <td>Matrikine, substrato</td>
+                                    <td>Articulações, tendões</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- SINERGIAS -->
+                    <div id="sinergias" class="pesquisa-content">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+                            <div class="card">
+                                <h4 style="color: var(--primary);">1️⃣ Tendões</h4>
+                                <p><strong>BPC-157 + Colágeno + Vitamina C</strong></p>
+                                <p style="font-size: 0.9em; color: var(--text-light);">Aceleração 40-60% na recuperação</p>
+                            </div>
+                            <div class="card">
+                                <h4 style="color: var(--primary);">2️⃣ Recuperação</h4>
+                                <p><strong>BPC-157 + TB-500</strong></p>
+                                <p style="font-size: 0.9em; color: var(--text-light);">Mecanismos complementares</p>
+                            </div>
+                            <div class="card">
+                                <h4 style="color: var(--primary);">3️⃣ Intestino</h4>
+                                <p><strong>BPC-157 + KPV</strong></p>
+                                <p style="font-size: 0.9em; color: var(--text-light);">Ideal para DII, Crohn</p>
+                            </div>
+                            <div class="card">
+                                <h4 style="color: var(--primary);">4️⃣ Regeneração</h4>
+                                <p><strong>GHK-Cu + TB-500</strong></p>
+                                <p style="font-size: 0.9em; color: var(--text-light);">Cicatrização complexa</p>
+                            </div>
+                            <div class="card">
+                                <h4 style="color: var(--primary);">5️⃣ Articulações</h4>
+                                <p><strong>Colágeno + KPV</strong></p>
+                                <p style="font-size: 0.9em; color: var(--text-light);">Osteoartrite crônica</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PROTOCOLO -->
+                    <div id="protocolo" class="pesquisa-content">
+                        <div class="card" style="border-left: 4px solid var(--success);">
+                            <h4>📅 Iniciante (Semana 1-4)</h4>
+                            <pre style="background: var(--bg-light); padding: 10px; border-radius: 6px;">• BPC-157: 250 mcg, 1×/dia, SC
+• Colágeno: 15g, 1×/dia, oral
+• Vitamina C: 100mg, 1×/dia</pre>
+                        </div>
+                        <div class="card" style="border-left: 4px solid var(--primary);">
+                            <h4>📅 Intermediário (Semana 5-12)</h4>
+                            <pre style="background: var(--bg-light); padding: 10px; border-radius: 6px;">• BPC-157: 500 mcg, 1-2×/semana, SC
+• TB-500: 1.5 mg, 1×/semana, SC
+• Colágeno: 15g, diário
+• GHK-Cu: 1 mg, 1×/semana, SC (opcional)</pre>
+                        </div>
+                        <div class="card" style="border-left: 4px solid var(--secondary);">
+                            <h4>📅 Ciclos de Pausa</h4>
+                            <pre style="background: var(--bg-light); padding: 10px; border-radius: 6px;">Após 8-12 semanas:
+• 30 dias OFF todos injetáveis
+• Manter: Colágeno oral + Vitamina C
+• Retomar novo ciclo</pre>
+                        </div>
+                    </div>
+
+                    <!-- REFERÊNCIAS -->
+                    <div id="referencias" class="pesquisa-content">
+                        <div>
+                            <h4 style="color: var(--primary); margin-top: 20px;">BPC-157</h4>
+                            <ul style="margin-left: 20px; color: var(--text-light);">
+                                <li>Sikiric P et al., Curr Pharm Des, 2018</li>
+                                <li>Staresinic M et al., J Physiol Pharmacol, 2006</li>
+                            </ul>
+                            <h4 style="color: var(--primary); margin-top: 20px;">TB-500</h4>
+                            <ul style="margin-left: 20px; color: var(--text-light);">
+                                <li>Malinda KM et al., J Invest Dermatol, 1999</li>
+                                <li>Bock-Marquette I et al., Nature, 2004</li>
+                            </ul>
+                            <h4 style="color: var(--primary); margin-top: 20px;">KPV</h4>
+                            <ul style="margin-left: 20px; color: var(--text-light);">
+                                <li>Brzoska T et al., Endocr Rev, 2008</li>
+                            </ul>
+                            <h4 style="color: var(--primary); margin-top: 20px;">GHK-Cu</h4>
+                            <ul style="margin-left: 20px; color: var(--text-light);">
+                                <li>Pickart L et al., J Cosmet Sci, 2012</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- LOGIN -->
+        <div id="login-container" class="auth-container">
+            <h2>🧴 Skincare Tracker</h2>
+            <div class="input-group">
+                <label>Email:</label>
+                <input type="email" id="email" placeholder="seu@email.com">
+            </div>
+            <div class="input-group">
+                <label>Senha:</label>
+                <input type="password" id="password" placeholder="Sua senha">
+            </div>
+            <button onclick="login()" style="width: 100%; margin-bottom: 10px;">Entrar</button>
+            <button onclick="signup()" style="width: 100%; background: var(--secondary);">Criar Conta</button>
+            <p id="auth-message" style="margin-top: 15px; text-align: center; color: var(--secondary);"></p>
+        </div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCrbmmAnMK_NGEHcYj5ZxF7eOJmSGNDp1s",
+            authDomain: "skincare-traker.firebaseapp.com",
+            databaseURL: "https://skincare-traker-default-rtdb.firebaseio.com",
+            projectId: "skincare-traker",
+            storageBucket: "skincare-traker.firebasestorage.app",
+            messagingSenderId: "201395673110",
+            appId: "1:201395673110:web:d827e5e396b1f6806e3d37"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
+
+        let currentUser = null;
+        let weightChart = null;
+
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                currentUser = user;
+                document.getElementById('app-container').style.display = 'block';
+                document.getElementById('login-container').style.display = 'none';
+                loadData();
+            } else {
+                document.getElementById('app-container').style.display = 'none';
+                document.getElementById('login-container').style.display = 'block';
+            }
+        });
+
+        function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            auth.signInWithEmailAndPassword(email, password)
+                .catch(e => showMessage("Erro: " + e.message));
+        }
+
+        function signup() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            auth.createUserWithEmailAndPassword(email, password)
+                .catch(e => showMessage("Erro: " + e.message));
+        }
+
+        function logout() {
+            auth.signOut();
+        }
+
+        function showMessage(msg) {
+            document.getElementById('auth-message').textContent = msg;
+        }
+
+        // NAVEGAÇÃO
+        function switchMenu(tabName) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.menu-button').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function switchPesquisa(tabName) {
+            document.querySelectorAll('.pesquisa-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-pesquisa-button').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // SALVAR DADOS
+        function saveRotina() {
+            if (!currentUser) return;
+            const rotina = {
+                manha: {
+                    mix02: document.getElementById('principia-mix-manha').checked,
+                    pm10: document.getElementById('principia-pm-manha').checked,
+                    vc10: document.getElementById('principia-vc-manha').checked,
+                    ghkcu: document.getElementById('ghkcu-topico-manha').checked,
+                },
+                noite: {
+                    cm01: document.getElementById('principia-cm-noite').checked,
+                    retinol: document.getElementById('retinol-noite').checked,
+                    tonico: document.getElementById('tonico-noite').checked,
+                    al10: document.getElementById('principia-al-noite').checked,
+                },
+                data: new Date().toISOString().split('T')[0]
+            };
+            db.ref(`users/${currentUser.uid}/rotina/${new Date().toISOString().split('T')[0]}`).set(rotina);
+            alert('✅ Rotina salva!');
+        }
+
+        function savePeptideo() {
+            if (!currentUser) return;
+            const peptideo = {
+                tipo: document.getElementById('peptideo-select').value,
+                dose: document.getElementById('dose-valor').value,
+                data: document.getElementById('data-aplicacao').value,
+                obs: document.getElementById('obs-peptideo').value,
+                timestamp: Date.now()
+            };
+            db.ref(`users/${currentUser.uid}/peptideos`).push(peptideo);
+            document.getElementById('peptideo-select').value = '';
+            document.getElementById('dose-valor').value = '';
+            document.getElementById('obs-peptideo').value = '';
+            alert('✅ Aplicação registrada!');
+            loadPeptideos();
+        }
+
+        function savePeso() {
+            if (!currentUser) return;
+            const peso = parseFloat(document.getElementById('peso-entrada').value);
+            const altura = parseFloat(document.getElementById('altura-entrada').value);
+            const imc = (peso / ((altura / 100) ** 2)).toFixed(1);
+
+            const registro = {
+                peso: peso,
+                altura: altura,
+                imc: imc,
+                data: document.getElementById('data-peso').value,
+                timestamp: Date.now()
+            };
+            db.ref(`users/${currentUser.uid}/peso`).push(registro);
+            alert('✅ Peso registrado!');
+            loadPeso();
+        }
+
+        function calcularDose() {
+            const peso = parseFloat(document.getElementById('peso-calc').value);
+            const peptideo = document.getElementById('peptideo-calc').value;
+            let resultado = '';
+
+            if (!peso || !peptideo) {
+                alert('Preencha todos os campos');
+                return;
+            }
+
+            const calculos = {
+                'BPC-157': `Recomendação: 250-500 mcg/semana (${Math.round(peso * 3)}-${Math.round(peso * 5)} mcg/dia)`,
+                'TB-500': `Recomendação: 1-2.5 mg/semana (ajustado para seu peso)`,
+                'KPV': `Recomendação: 100-500 mcg/dia (${Math.round(peso * 1.5)}-${Math.round(peso * 3)} mcg total)`,
+                'GHK-Cu': `Recomendação: 1-2 mg/dia em ciclos (30 ON / 30 OFF)`
+            };
+
+            document.getElementById('resultado-calc').innerHTML = `
+                <div class="card" style="background: var(--bg-light); border-left: 4px solid var(--success);">
+                    <h4 style="color: var(--success);">📊 ${calculos[peptideo]}</h4>
+                    <p style="margin-top: 10px; font-size: 0.9em; color: var(--text-light);">⚠️ Consulte profissional antes de usar</p>
+                </div>
+            `;
+        }
+
+        function loadPeptideos() {
+            if (!currentUser) return;
+            db.ref(`users/${currentUser.uid}/peptideos`).limitToLast(10).once('value', snap => {
+                const html = [];
+                snap.forEach(child => {
+                    const p = child.val();
+                    html.push(`
+                        <div class="peptide-item">
+                            <strong>${p.tipo}</strong><br>
+                            Dose: ${p.dose}mg | Data: ${p.data}<br>
+                            <small>${p.obs || 'Sem observações'}</small>
+                        </div>
+                    `);
+                });
+                document.getElementById('peptideo-history').innerHTML = html.join('');
+            });
+        }
+
+        function loadPeso() {
+            if (!currentUser) return;
+            db.ref(`users/${currentUser.uid}/peso`).once('value', snap => {
+                const pesos = [];
+                const datas = [];
+                snap.forEach(child => {
+                    const p = child.val();
+                    pesos.push(p.peso);
+                    datas.push(p.data);
+                });
+
+                if (pesos.length > 0) {
+                    document.getElementById('peso-atual').textContent = pesos[pesos.length - 1] + ' kg';
+                    const altura = parseFloat(document.getElementById('altura-entrada').value) / 100;
+                    const imc = (pesos[pesos.length - 1] / (altura * altura)).toFixed(1);
+                    document.getElementById('imc-valor').textContent = imc;
+
+                    if (weightChart) weightChart.destroy();
+                    const ctx = document.getElementById('weightChart').getContext('2d');
+                    weightChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: datas,
+                            datasets: [{
+                                label: 'Peso (kg)',
+                                data: pesos,
+                                borderColor: '#7c3aed',
+                                backgroundColor: 'rgba(124, 58, 237, 0.1)',
+                                tension: 0.3
+                            }]
+                        },
+                        options: { responsive: true, plugins: { legend: { display: true } } }
+                    });
+                }
+
+                const tbody = document.getElementById('peso-table-body');
+                tbody.innerHTML = '';
+                snap.forEach(child => {
+                    const p = child.val();
+                    tbody.innerHTML += `<tr><td>${p.data}</td><td>${p.peso} kg</td><td>${p.altura} cm</td><td>${p.imc}</td></tr>`;
+                });
+            });
+        }
+
+        function loadData() {
+            loadPeptideos();
+            loadPeso();
+        }
+
+        // Inicialização
+        document.getElementById('data-aplicacao').valueAsDate = new Date();
+        document.getElementById('data-peso').valueAsDate = new Date();
+    </script>
+</body>
+</html>
