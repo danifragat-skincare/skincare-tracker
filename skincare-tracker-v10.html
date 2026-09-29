@@ -626,6 +626,7 @@
     </div>
 
     <script>
+        // Firebase v8 carrega de forma síncrona — disponível imediatamente aqui
         const firebaseConfig = {
             apiKey: "AIzaSyBJeJ2S_mKEfxLYrRz5X7Q-qZrS9t_6x0k",
             authDomain: "skincare-traker.firebaseapp.com",
@@ -636,27 +637,16 @@
             appId: "1:1067637563607:web:5f4c82f34e6e9e8b74eb16"
         };
 
-        let auth, db;
-        let firebaseReady = false;
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
 
-        // Wait for Firebase to be defined before initializing
-        function initializeFirebase() {
-            if (typeof firebase === 'undefined') {
-                console.log('Firebase ainda não foi carregado, tentando novamente em 100ms...');
-                setTimeout(initializeFirebase, 100);
-                return;
-            }
+        let currentUser = null;
+        let pesoChart = null;
+        let registrosPeso = [];
+        let metaAtual = {};
 
-            firebase.initializeApp(firebaseConfig);
-            auth = firebase.auth();
-            db = firebase.database();
-            firebaseReady = true;
-            console.log('Firebase inicializado com sucesso!');
-            setupAuthListener();
-        }
-
-        function setupAuthListener() {
-            auth.onAuthStateChanged((user) => {
+        auth.onAuthStateChanged((user) => {
             if (user) {
                 currentUser = user;
                 document.getElementById('authContainer').style.display = 'none';
@@ -670,14 +660,6 @@
                 document.getElementById('appContainer').style.display = 'none';
             }
         });
-        }
-
-        let currentUser = null;
-        let pesoChart = null;
-        let registrosPeso = [];
-        let metaAtual = {};
-
-        initializeFirebase();
 
         function login() {
             const email = document.getElementById('authEmail').value;
