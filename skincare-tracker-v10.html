@@ -602,26 +602,148 @@
                 </div>
             </div>
 
-            <!-- Outras seções -->
+            <!-- Rotina Diária -->
             <div id="rotina" class="content-section active">
                 <h2 class="section-title">📅 Rotina Diária</h2>
-                <p style="color: #999;">Seção de rotina diária - em breve com funcionalidades expandidas</p>
+                <div class="card">
+                    <div class="card-title">💊 Peptídeos em Uso</div>
+                    <div id="peptideosEmUso"><div class="empty-state"><div class="empty-state-icon">💉</div><p>Nenhum peptídeo em uso</p></div></div>
+                    <button class="btn-primary" onclick="openAddPeptideoEmUsoModal()" style="margin-top:1rem;">+ Adicionar Peptídeo</button>
+                </div>
+                <div class="card">
+                    <div class="card-title">🌅 Rotina Manhã</div>
+                    <div id="rotinaManha"><div class="empty-state"><div class="empty-state-icon">🧴</div><p>Nenhum produto</p></div></div>
+                    <button class="btn-primary" onclick="openAddProductModal('manha')" style="margin-top:1rem;">+ Adicionar Produto</button>
+                </div>
+                <div class="card">
+                    <div class="card-title">🌙 Rotina Noite</div>
+                    <div id="rotinaNoite"><div class="empty-state"><div class="empty-state-icon">🧴</div><p>Nenhum produto</p></div></div>
+                    <button class="btn-primary" onclick="openAddProductModal('noite')" style="margin-top:1rem;">+ Adicionar Produto</button>
+                </div>
             </div>
 
+            <!-- Peptídeos Injetáveis -->
             <div id="peptideos" class="content-section">
                 <h2 class="section-title">💉 Peptídeos Injetáveis</h2>
-                <p style="color: #999;">Seção de peptídeos - em breve com funcionalidades expandidas</p>
+                <div class="card">
+                    <div class="card-title">💉 Registrar Nova Dose</div>
+                    <div style="background:var(--gray-50,#f9fafb);padding:1.5rem;border-radius:0.5rem;margin-bottom:1rem;">
+                        <div class="form-group"><label>Tipo</label>
+                        <select id="peptideoNome" style="width:100%;padding:0.75rem;border:1px solid #e2e8f0;border-radius:0.5rem;font-size:1rem;">
+                            <option value="">Selecione</option>
+                            <option>Tirzepatida 15mg/0,5ml</option>
+                            <option>Retatrutida 40mg</option>
+                            <option>GHK-Cu 50mg</option>
+                            <option>GHK-Cu 100mg</option>
+                            <option>GLOW</option>
+                            <option>BPC-157</option>
+                            <option>TB 500</option>
+                        </select></div>
+                        <div class="form-group"><label>Dose (mg)</label><input type="number" id="dosePeptideo" placeholder="Ex: 3" step="0.1" style="width:100%;padding:0.75rem;border:1px solid #e2e8f0;border-radius:0.5rem;font-size:1rem;box-sizing:border-box;"></div>
+                        <div class="form-group"><label>Local</label><select id="localAplicacao" style="width:100%;padding:0.75rem;border:1px solid #e2e8f0;border-radius:0.5rem;font-size:1rem;"><option value="">Selecione</option><option>Subcutânea</option><option>Intramuscular</option><option>Tópica</option></select></div>
+                        <div class="form-group"><label>Notas (opcional)</label><input type="text" id="notasPeptideo" placeholder="Resultado, sensações..." style="width:100%;padding:0.75rem;border:1px solid #e2e8f0;border-radius:0.5rem;font-size:1rem;box-sizing:border-box;"></div>
+                        <button class="btn-primary" onclick="saveDosePeptideo()">Registrar Dose</button>
+                    </div>
+                </div>
+                <div class="card"><div class="card-title">📋 Histórico</div><div id="historicoPeptideos"><div class="empty-state"><div class="empty-state-icon">📊</div><p>Nenhuma dose registrada</p></div></div></div>
             </div>
 
+            <!-- Calculadora -->
             <div id="calculadora" class="content-section">
                 <h2 class="section-title">🧮 Calculadora de Doses</h2>
-                <p style="color: #999;">Seção de calculadora - em breve com funcionalidades expandidas</p>
+                <div class="card">
+                    <div class="card-title">🧮 Calcular Reconstituição</div>
+                    <div style="background:var(--gray-50,#f9fafb);padding:1.5rem;border-radius:0.5rem;margin-bottom:1rem;">
+                        <div class="form-group"><label>1. Qual peptídeo?</label>
+                        <select id="calcPeptideo" onchange="atualizarCalculadora()" style="width:100%;padding:0.75rem;border:1px solid #e2e8f0;border-radius:0.5rem;font-size:1rem;">
+                            <option value="">Selecione</option>
+                            <option value="tirzepatida">Tirzepatida 15mg/0,5ml</option>
+                            <option value="retatrutida">Retatrutida 40mg</option>
+                            <option value="ghkcu50">GHK-Cu 50mg</option>
+                            <option value="ghkcu100">GHK-Cu 100mg</option>
+                            <option value="glow">GLOW</option>
+                            <option value="bpc157">BPC-157</option>
+                            <option value="tb500">TB 500</option>
+                        </select></div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+                            <div class="form-group"><label>2. Quantidade (mg)</label><input type="number" id="conteudoFrasco" placeholder="Ex: 5" step="0.1" min="0" oninput="atualizarCalculadora()" style="width:100%;padding:0.75rem;border:1px solid #e2e8f0;border-radius:0.5rem;font-size:1rem;box-sizing:border-box;"></div>
+                            <div class="form-group"><label>3. Água bact. (ml)</label><input type="number" id="volumeAgua" placeholder="Ex: 2" step="0.1" min="0" oninput="atualizarCalculadora()" style="width:100%;padding:0.75rem;border:1px solid #e2e8f0;border-radius:0.5rem;font-size:1rem;box-sizing:border-box;"></div>
+                        </div>
+                        <div class="form-group"><label>4. Dose desejada (mg)</label><input type="number" id="dosePorInjecao" placeholder="Ex: 1" step="0.1" min="0" oninput="atualizarCalculadora()" style="width:100%;padding:0.75rem;border:1px solid #e2e8f0;border-radius:0.5rem;font-size:1rem;box-sizing:border-box;"></div>
+                        <div class="form-group"><label>5. Seringa</label><div style="display:flex;gap:1rem;flex-wrap:wrap;margin-top:0.5rem;">
+                            <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;"><input type="radio" name="tamanhoSeringa" value="30" onchange="atualizarCalculadora()"> 30U</label>
+                            <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;"><input type="radio" name="tamanhoSeringa" value="50" checked onchange="atualizarCalculadora()"> 50U</label>
+                            <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;"><input type="radio" name="tamanhoSeringa" value="100" onchange="atualizarCalculadora()"> 100U</label>
+                        </div></div>
+                    </div>
+                    <div id="resultadoCalc" style="display:none; margin-top:1rem;">
+                        <div style="text-align:center;padding:2rem;background:linear-gradient(135deg,#6c63ff,#a78bfa);border-radius:1rem;color:white;margin-bottom:1rem;">
+                            <div style="font-size:3rem;font-weight:800;" id="unidadesAPuxar">—</div>
+                            <div style="font-size:1rem;opacity:0.9;">Unidades a puxar</div>
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+                            <div style="background:#f8f7ff;padding:1rem;border-radius:0.5rem;border-left:4px solid #6c63ff;"><div style="font-size:0.85rem;color:#666;">Concentração</div><div style="font-size:1.3rem;font-weight:700;color:#6c63ff;" id="concentracao">—</div></div>
+                            <div style="background:#f0fdf4;padding:1rem;border-radius:0.5rem;border-left:4px solid #22c55e;"><div style="font-size:0.85rem;color:#666;">Doses/frasco</div><div style="font-size:1.3rem;font-weight:700;color:#22c55e;" id="dosesFreco">—</div></div>
+                        </div>
+                        <div id="alertaSeringa" style="display:none;background:#ef4444;color:white;padding:1rem;border-radius:0.5rem;margin-top:1rem;text-align:center;font-weight:600;">⚠️ Dose ultrapassa capacidade da seringa!</div>
+                    </div>
+                </div>
             </div>
 
+            <!-- Pesquisar -->
             <div id="pesquisa" class="content-section">
                 <h2 class="section-title">🔍 Pesquisar</h2>
-                <p style="color: #999;">Seção de pesquisa - em breve com funcionalidades expandidas</p>
+                <div class="card">
+                    <div class="card-title">🔍 Links Úteis</div>
+                    <div style="display:flex;flex-direction:column;gap:1rem;margin-top:1rem;">
+                        <a href="https://claude.ai" target="_blank" style="display:block;padding:1rem 1.5rem;background:linear-gradient(135deg,#6c63ff,#a78bfa);color:white;border-radius:0.75rem;text-decoration:none;font-weight:600;text-align:center;">💬 Chat com Claude<br><span style="font-size:0.85rem;font-weight:normal;opacity:0.9;">Pesquise ingredientes e protocolos</span></a>
+                        <a href="https://www.google.com/search?q=skincare+peptideos" target="_blank" style="display:block;padding:1rem 1.5rem;background:#f1f5f9;color:#374151;border-radius:0.75rem;text-decoration:none;font-weight:600;text-align:center;border:1px solid #e2e8f0;">🔎 Google<br><span style="font-size:0.85rem;font-weight:normal;color:#6b7280;">Buscar avaliações e estudos</span></a>
+                        <a href="https://pubmed.ncbi.nlm.nih.gov/?term=peptides+skincare" target="_blank" style="display:block;padding:1rem 1.5rem;background:#f1f5f9;color:#374151;border-radius:0.75rem;text-decoration:none;font-weight:600;text-align:center;border:1px solid #e2e8f0;">🔬 PubMed<br><span style="font-size:0.85rem;font-weight:normal;color:#6b7280;">Estudos científicos</span></a>
+                    </div>
+                </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Modal Adicionar Produto -->
+    <div id="addProductModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center;padding:1rem;">
+        <div style="background:white;border-radius:1rem;padding:2rem;width:100%;max-width:400px;">
+            <div style="font-size:1.2rem;font-weight:700;margin-bottom:1.5rem;">Adicionar Produto</div>
+            <form onsubmit="saveProduct(event)">
+                <div class="form-group"><label>Nome *</label><input type="text" id="productNome" required style="width:100%;padding:0.75rem;border:1px solid #e2e8f0;border-radius:0.5rem;font-size:1rem;box-sizing:border-box;margin-top:0.25rem;"></div>
+                <div class="form-group"><label>Marca</label><input type="text" id="productMarca" style="width:100%;padding:0.75rem;border:1px solid #e2e8f0;border-radius:0.5rem;font-size:1rem;box-sizing:border-box;margin-top:0.25rem;"></div>
+                <div class="form-group"><label>Tipo</label><select id="productTipo" style="width:100%;padding:0.75rem;border:1px solid #e2e8f0;border-radius:0.5rem;font-size:1rem;margin-top:0.25rem;"><option value="">Selecione</option><option>Limpador</option><option>Tônico</option><option>Sérum</option><option>Hidratante</option><option>Protetor Solar</option><option>Outro</option></select></div>
+                <div style="display:flex;gap:0.75rem;margin-top:1.5rem;">
+                    <button type="submit" style="flex:1;padding:0.75rem;background:linear-gradient(135deg,#6c63ff,#a78bfa);color:white;border:none;border-radius:0.75rem;font-weight:600;cursor:pointer;">Adicionar</button>
+                    <button type="button" onclick="closeAddProductModal()" style="flex:1;padding:0.75rem;background:#f1f5f9;color:#374151;border:none;border-radius:0.75rem;font-weight:600;cursor:pointer;">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Adicionar Peptídeo em Uso -->
+    <div id="addPeptideoEmUsoModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center;padding:1rem;">
+        <div style="background:white;border-radius:1rem;padding:2rem;width:100%;max-width:400px;">
+            <div style="font-size:1.2rem;font-weight:700;margin-bottom:1.5rem;">Adicionar Peptídeo em Uso</div>
+            <form onsubmit="savePeptideoEmUso(event)">
+                <div class="form-group"><label>Tipo *</label>
+                <select id="peptideoEmUsoNome" required style="width:100%;padding:0.75rem;border:1px solid #e2e8f0;border-radius:0.5rem;font-size:1rem;margin-top:0.25rem;">
+                    <option value="">Selecione</option>
+                    <option>Tirzepatida 15mg/0,5ml</option>
+                    <option>Retatrutida 40mg</option>
+                    <option>GHK-Cu 50mg</option>
+                    <option>GHK-Cu 100mg</option>
+                    <option>GLOW</option>
+                    <option>BPC-157</option>
+                    <option>TB 500</option>
+                </select></div>
+                <div class="form-group"><label>Dose (mg) *</label><input type="number" id="peptideoEmUsoDose" step="0.1" required style="width:100%;padding:0.75rem;border:1px solid #e2e8f0;border-radius:0.5rem;font-size:1rem;box-sizing:border-box;margin-top:0.25rem;"></div>
+                <div class="form-group"><label>Data Início *</label><input type="date" id="peptideoEmUsoDataInicio" style="width:100%;padding:0.75rem;border:1px solid #e2e8f0;border-radius:0.5rem;font-size:1rem;box-sizing:border-box;margin-top:0.25rem;"></div>
+                <div style="display:flex;gap:0.75rem;margin-top:1.5rem;">
+                    <button type="submit" style="flex:1;padding:0.75rem;background:linear-gradient(135deg,#6c63ff,#a78bfa);color:white;border:none;border-radius:0.75rem;font-weight:600;cursor:pointer;">Adicionar</button>
+                    <button type="button" onclick="closeAddPeptideoEmUsoModal()" style="flex:1;padding:0.75rem;background:#f1f5f9;color:#374151;border:none;border-radius:0.75rem;font-weight:600;cursor:pointer;">Cancelar</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -796,6 +918,15 @@
 
         function carregarDados() {
             if (!currentUser) return;
+
+            // Carregar rotina e peptídeos
+            db.ref('users/'+currentUser.uid).on('value', (snapshot) => {
+                const data = snapshot.val()||{};
+                displayRotina('rotinaManha', data.rotinas?.manha||{}, 'manha');
+                displayRotina('rotinaNoite', data.rotinas?.noite||{}, 'noite');
+                displayPeptideosEmUso(data.peptideos_em_uso||{});
+                displayHistoricoPeptideos(data.peptideos||{});
+            });
 
             // Carregar meta de peso
             db.ref(`users/${currentUser.uid}/meta_peso`).on('value', (snapshot) => {
@@ -1015,6 +1146,130 @@
                         child.ref.remove();
                     });
                 });
+        }
+
+        // ===== CALCULADORA =====
+        function atualizarCalculadora() {
+            const cf = parseFloat(document.getElementById('conteudoFrasco').value);
+            const va = parseFloat(document.getElementById('volumeAgua').value);
+            const dp = parseFloat(document.getElementById('dosePorInjecao').value);
+            const ts = document.querySelector('input[name="tamanhoSeringa"]:checked');
+            if (!cf||!va||!dp||!ts) { document.getElementById('resultadoCalc').style.display='none'; return; }
+            const conc = cf/va;
+            const u = Math.round((dp/conc)*100);
+            document.getElementById('unidadesAPuxar').textContent = u+' U';
+            document.getElementById('concentracao').textContent = conc.toFixed(2)+' mg/ml';
+            document.getElementById('dosesFreco').textContent = Math.round((cf/dp)*10)/10;
+            document.getElementById('alertaSeringa').style.display = u>parseInt(ts.value)?'block':'none';
+            document.getElementById('resultadoCalc').style.display = 'block';
+        }
+
+        // ===== PEPTÍDEOS EM USO =====
+        function calcularTempoDecorrido(dataInicio) {
+            const dias = Math.floor((new Date() - new Date(dataInicio)) / (1000*60*60*24));
+            if (dias === 0) return 'Iniciado hoje';
+            if (dias === 1) return '1 dia em uso';
+            if (dias < 7) return dias + ' dias em uso';
+            const sem = Math.floor(dias/7), r = dias%7;
+            return sem + ' semana' + (sem>1?'s':'') + (r?' e '+r+' dia'+(r>1?'s':''):'') + ' em uso';
+        }
+
+        function openAddPeptideoEmUsoModal() {
+            document.getElementById('peptideoEmUsoNome').value = '';
+            document.getElementById('peptideoEmUsoDose').value = '';
+            document.getElementById('peptideoEmUsoDataInicio').value = new Date().toISOString().split('T')[0];
+            document.getElementById('addPeptideoEmUsoModal').style.display = 'flex';
+        }
+        function closeAddPeptideoEmUsoModal() { document.getElementById('addPeptideoEmUsoModal').style.display = 'none'; }
+
+        function savePeptideoEmUso(event) {
+            event.preventDefault();
+            const nome = document.getElementById('peptideoEmUsoNome').value;
+            const dose = document.getElementById('peptideoEmUsoDose').value;
+            const dataInicio = document.getElementById('peptideoEmUsoDataInicio').value;
+            if (!nome || !dose || !dataInicio || !currentUser) { alert('Preencha todos os campos'); return; }
+            db.ref('users/'+currentUser.uid+'/peptideos_em_uso/'+Date.now()).set({ nome, dose: parseFloat(dose), dataInicio, adicionadoEm: new Date().toISOString() })
+                .then(() => { closeAddPeptideoEmUsoModal(); })
+                .catch(e => alert('Erro: '+e.message));
+        }
+
+        function deletePeptideoEmUso(id) {
+            if (confirm('Remover?')) { db.ref('users/'+currentUser.uid+'/peptideos_em_uso/'+id).remove().catch(e=>{}); }
+        }
+
+        function displayPeptideosEmUso(peptideos) {
+            const c = document.getElementById('peptideosEmUso');
+            if (!peptideos || !Object.keys(peptideos).length) { c.innerHTML = '<div class="empty-state"><div class="empty-state-icon">💉</div><p>Nenhum peptídeo em uso</p></div>'; return; }
+            c.innerHTML = Object.entries(peptideos).map(([id,p]) =>
+                '<div style="display:flex;justify-content:space-between;align-items:center;padding:1rem;background:#f8f7ff;border-radius:0.75rem;margin-bottom:0.5rem;"><div><div style="font-weight:700;">'+p.nome+'</div><div style="font-size:0.85rem;color:#666;">📅 '+calcularTempoDecorrido(p.dataInicio)+'</div><div style="font-size:0.85rem;color:#22c55e;font-weight:600;">💊 '+p.dose+'mg</div></div><button onclick="deletePeptideoEmUso(\''+id+'\')" style="background:#ef4444;color:white;border:none;padding:0.4rem 0.75rem;border-radius:0.5rem;cursor:pointer;font-size:0.8rem;">Remover</button></div>'
+            ).join('');
+        }
+
+        // ===== ROTINA =====
+        let currentPeriodoModal = null;
+
+        function openAddProductModal(periodo) {
+            currentPeriodoModal = periodo;
+            document.getElementById('productNome').value = '';
+            document.getElementById('productMarca').value = '';
+            document.getElementById('productTipo').value = '';
+            document.getElementById('addProductModal').style.display = 'flex';
+        }
+        function closeAddProductModal() { document.getElementById('addProductModal').style.display = 'none'; }
+
+        function saveProduct(event) {
+            event.preventDefault();
+            const nome = document.getElementById('productNome').value;
+            if (!nome || !currentUser || !currentPeriodoModal) return;
+            db.ref('users/'+currentUser.uid+'/rotinas/'+currentPeriodoModal+'/'+Date.now()).set({
+                nome, marca: document.getElementById('productMarca').value||'Sem marca',
+                tipo: document.getElementById('productTipo').value||'Sem tipo', aplicado: false, adicionadoEm: new Date().toISOString()
+            }).then(() => closeAddProductModal()).catch(e => alert('Erro: '+e.message));
+        }
+
+        function deleteProduto(uid,periodo,id) {
+            if (confirm('Deletar?')) { db.ref('users/'+uid+'/rotinas/'+periodo+'/'+id).remove().catch(e=>{}); }
+        }
+
+        function updateProduto(uid,periodo,id,aplicado) {
+            db.ref('users/'+uid+'/rotinas/'+periodo+'/'+id+'/aplicado').set(aplicado).catch(e=>{});
+        }
+
+        function displayRotina(elementId, rotina, periodo) {
+            const c = document.getElementById(elementId);
+            if (!rotina || !Object.keys(rotina).length) { c.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🧴</div><p>Nenhum produto</p></div>'; return; }
+            c.innerHTML = Object.entries(rotina).map(([id,p]) =>
+                '<div style="display:flex;align-items:center;gap:0.75rem;padding:0.75rem;background:#f9fafb;border-radius:0.75rem;margin-bottom:0.5rem;'+(p.aplicado?'opacity:0.6;':'')+'">'
+                +'<input type="checkbox" '+(p.aplicado?'checked':'')+' onchange="updateProduto(\''+currentUser.uid+'\',\''+periodo+'\',\''+id+'\',this.checked)" style="width:1.2rem;height:1.2rem;cursor:pointer;">'
+                +'<div style="flex:1;"><div style="font-weight:600;'+(p.aplicado?'text-decoration:line-through;color:#999;':'')+'">'+(p.nome||'')+'</div><div style="font-size:0.8rem;color:#888;">'+(p.marca||'')+'</div></div>'
+                +'<button onclick="deleteProduto(\''+currentUser.uid+'\',\''+periodo+'\',\''+id+'\')" style="background:none;border:none;color:#ef4444;cursor:pointer;font-size:1.1rem;">🗑</button></div>'
+            ).join('');
+        }
+
+        // ===== HISTÓRICO PEPTÍDEOS =====
+        function displayHistoricoPeptideos(peptideos) {
+            const c = document.getElementById('historicoPeptideos');
+            if (!c) return;
+            if (!peptideos || !Object.keys(peptideos).length) { c.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📊</div><p>Nenhuma dose</p></div>'; return; }
+            c.innerHTML = Object.entries(peptideos).sort((a,b)=>new Date(b[1].data)-new Date(a[1].data)).map(([id,d]) =>
+                '<div style="padding:0.75rem;background:#f9fafb;border-radius:0.75rem;margin-bottom:0.5rem;border-left:3px solid #6c63ff;">'
+                +'<div style="font-weight:700;">'+d.tipo+' — '+d.dosagem+'mg</div>'
+                +'<div style="font-size:0.85rem;color:#666;">'+new Date(d.data).toLocaleDateString('pt-BR')+' • '+d.local+'</div>'
+                +(d.notas?'<div style="font-size:0.85rem;color:#888;margin-top:0.25rem;">📝 '+d.notas+'</div>':'')+'</div>'
+            ).join('');
+        }
+
+        function saveDosePeptideo() {
+            const tipo = document.getElementById('peptideoNome').value;
+            const dosagem = document.getElementById('dosePeptideo').value;
+            const local = document.getElementById('localAplicacao').value;
+            const notas = document.getElementById('notasPeptideo').value;
+            if (!tipo||!dosagem||!local||!currentUser) { alert('Preencha todos os campos'); return; }
+            db.ref('users/'+currentUser.uid+'/peptideos/'+Date.now()).set({ tipo, dosagem:parseFloat(dosagem), local, notas, data:new Date().toISOString() })
+                .then(() => {
+                    ['peptideoNome','dosePeptideo','localAplicacao','notasPeptideo'].forEach(id => document.getElementById(id).value='');
+                    alert('Dose registrada!');
+                }).catch(e => alert('Erro: '+e.message));
         }
 
         function exportarCSV() {
