@@ -980,7 +980,7 @@
             const data = document.getElementById('pesoDta').value;
 
             if (!altura || !peso || !data) {
-                alert('Preencha altura, peso e data');
+                console.warn('Preencha altura, peso e data');
                 return;
             }
 
@@ -1009,13 +1009,13 @@
             const data = document.getElementById('medidasData').value;
 
             if (!data) {
-                alert('Preencha a data');
+                console.warn('Preencha a data');
                 return;
             }
 
             // Validar se pelo menos uma medida foi preenchida
             if (peito === null && cintura === null && quadril === null) {
-                alert('Preencha pelo menos uma medida (peito, cintura ou quadril)');
+                console.warn('Preencha pelo menos uma medida (peito, cintura ou quadril)');
                 return;
             }
 
@@ -1048,7 +1048,7 @@
             const pesoInicial = parseFloat(document.getElementById('pesoInicial').value);
 
             if (!pesoAlvo || !pesoInicial) {
-                alert('Preencha peso inicial e peso alvo');
+                console.warn('Preencha peso inicial e peso alvo');
                 return;
             }
 
@@ -1062,7 +1062,7 @@
 
             db.ref(`users/${currentUser.uid}/meta_peso`).set(metaAtual)
                 .then(() => {
-                    alert('Meta salva com sucesso!');
+                    console.log('✓ Meta salva com sucesso!');
                     atualizarProgresso();
                 })
                 .catch(err => console.error('Erro ao salvar meta:', err));
@@ -1367,10 +1367,10 @@
             const nome = document.getElementById('peptideoEmUsoNome').value;
             const dose = document.getElementById('peptideoEmUsoDose').value;
             const dataInicio = document.getElementById('peptideoEmUsoDataInicio').value;
-            if (!nome || !dose || !dataInicio || !currentUser) { alert('Preencha todos os campos'); return; }
+            if (!nome || !dose || !dataInicio || !currentUser) { console.warn('Preencha todos os campos'); return; }
             db.ref('users/'+currentUser.uid+'/peptideos_em_uso/'+Date.now()).set({ nome, dose: parseFloat(dose), dataInicio, adicionadoEm: new Date().toISOString() })
                 .then(() => { closeAddPeptideoEmUsoModal(); })
-                .catch(e => alert('Erro: '+e.message));
+                .catch(e => console.error('Erro: '+e.message));
         }
 
         function deletePeptideoEmUso(id) {
@@ -1404,7 +1404,7 @@
             db.ref('users/'+currentUser.uid+'/rotinas/'+currentPeriodoModal+'/'+Date.now()).set({
                 nome, marca: document.getElementById('productMarca').value||'Sem marca',
                 tipo: document.getElementById('productTipo').value||'Sem tipo', aplicado: false, adicionadoEm: new Date().toISOString()
-            }).then(() => closeAddProductModal()).catch(e => alert('Erro: '+e.message));
+            }).then(() => closeAddProductModal()).catch(e => console.error('Erro: '+e.message));
         }
 
         function deleteProduto(uid,periodo,id) {
@@ -1444,17 +1444,17 @@
             const dosagem = document.getElementById('dosePeptideo').value;
             const local = document.getElementById('localAplicacao').value;
             const notas = document.getElementById('notasPeptideo').value;
-            if (!tipo||!dosagem||!local||!currentUser) { alert('Preencha todos os campos'); return; }
+            if (!tipo||!dosagem||!local||!currentUser) { console.warn('Preencha todos os campos'); return; }
             db.ref('users/'+currentUser.uid+'/peptideos/'+Date.now()).set({ tipo, dosagem:parseFloat(dosagem), local, notas, data:new Date().toISOString() })
                 .then(() => {
                     ['peptideoNome','dosePeptideo','localAplicacao','notasPeptideo'].forEach(id => document.getElementById(id).value='');
-                    alert('Dose registrada!');
-                }).catch(e => alert('Erro: '+e.message));
+                    console.log('✓ Dose registrada!');
+                }).catch(e => console.error('Erro: '+e.message));
         }
 
         function exportarCSV() {
             if (registrosPeso.length === 0) {
-                alert('Nenhum dado para exportar');
+                console.warn('Nenhum dado para exportar');
                 return;
             }
 
