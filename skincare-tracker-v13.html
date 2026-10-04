@@ -1072,6 +1072,11 @@
         function carregarDados() {
             if (!currentUser) return;
 
+            // Remover listeners antigos antes de adicionar novos
+            db.ref('users/'+currentUser.uid).off();
+            db.ref(`users/${currentUser.uid}/meta_peso`).off();
+            db.ref(`users/${currentUser.uid}/peso_registros`).off();
+
             // Carregar rotina e peptídeos
             db.ref('users/'+currentUser.uid).on('value', (snapshot) => {
                 const data = snapshot.val()||{};
