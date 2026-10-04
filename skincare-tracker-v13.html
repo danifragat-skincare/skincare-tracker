@@ -1003,9 +1003,9 @@
         }
 
         function registrarMedidas() {
-            const peito = parseFloat(document.getElementById('medidaPeito').value);
-            const cintura = parseFloat(document.getElementById('medidaCintura').value);
-            const quadril = parseFloat(document.getElementById('medidaQuadril').value);
+            const peito = parseFloat(document.getElementById('medidaPeito').value) || null;
+            const cintura = parseFloat(document.getElementById('medidaCintura').value) || null;
+            const quadril = parseFloat(document.getElementById('medidaQuadril').value) || null;
             const data = document.getElementById('medidasData').value;
 
             if (!data) {
@@ -1013,25 +1013,35 @@
                 return;
             }
 
+            // Validar se pelo menos uma medida foi preenchida
+            if (peito === null && cintura === null && quadril === null) {
+                alert('Preencha pelo menos uma medida (peito, cintura ou quadril)');
+                return;
+            }
+
             if (!currentUser) return;
 
             const novoRegistro = {
                 data: data,
-                peito: peito || null,
-                cintura: cintura || null,
-                quadril: quadril || null,
+                peito: peito,
+                cintura: cintura,
+                quadril: quadril,
                 timestamp: new Date().getTime()
             };
 
             db.ref(`users/${currentUser.uid}/medidas_registros`).push(novoRegistro)
                 .then(() => {
+                    alert('✓ Medidas salvas com sucesso!');
                     document.getElementById('medidaPeito').value = '';
                     document.getElementById('medidaCintura').value = '';
                     document.getElementById('medidaQuadril').value = '';
                     setDataAtual();
                     carregarDados();
                 })
-                .catch(err => console.error('Erro ao registrar medidas:', err));
+                .catch(err => {
+                    console.error('Erro ao registrar medidas:', err);
+                    alert('Erro ao salvar medidas. Tente novamente.');
+                });
         }
 
         function salvarMeta() {
@@ -1244,33 +1254,47 @@
         function atualizarHistoricoPeso() {
             const tbody = document.getElementById('pesoHistorico');
 
-            if (registrosPeso.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" class="no-data">Nenhum registro ainda</td></tr>';
-                return;
-            }
-
-            db.ref(`users/${currentUser.uid}/medidas_registros`).once('value', (snapshot) => {
+            db.ref(`users/${currentUser.uid}/medidas_registros`).once('value', (snapMedidas) => {
                 const medidas = {};
-                if (snapshot.exists()) {
-                    snapshot.forEach((child) => {
-                        medidas[child.val().data] = child.val();
+                const datas = new Set();
+
+                if (snapMedidas.exists()) {
+                    snapMedidas.forEach((child) => {
+                        const val = child.val();
+                        medidas[val.data] = val;
+                        datas.add(val.data);
                     });
                 }
 
-                tbody.innerHTML = registrosPeso.map(reg => {
-                    const imc = (reg.peso / (reg.altura / 100) ** 2).toFixed(1);
-                    const med = medidas[reg.data] || {};
+                // Combinar datas de peso e medidas
+                registrosPeso.forEach(reg => datas.add(reg.data));
+
+                if (datas.size === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="no-data">Nenhum registro ainda</td></tr>';
+                    return;
+                }
+
+                // Converter para array e ordenar por data (mais recente primeiro)
+                const datasOrdenadas = Array.from(datas).sort((a, b) => new Date(b) - new Date(a));
+
+                tbody.innerHTML = datasOrdenadas.map(data => {
+                    const peso = registrosPeso.find(p => p.data === data);
+                    const med = medidas[data] || {};
+
+                    const imc = peso ? (peso.peso / (peso.altura / 100) ** 2).toFixed(1) : '--';
+                    const pesoVal = peso ? peso.peso : '--';
+                    const timestamp = peso ? peso.timestamp : (med.timestamp || new Date().getTime());
 
                     return `
                         <tr>
-                            <td>${new Date(reg.data).toLocaleDateString('pt-BR')}</td>
-                            <td><strong>${reg.peso}</strong></td>
+                            <td>${new Date(data).toLocaleDateString('pt-BR')}</td>
+                            <td><strong>${pesoVal}</strong></td>
                             <td>${imc}</td>
                             <td>${med.peito ? med.peito : '--'}</td>
                             <td>${med.cintura ? med.cintura : '--'}</td>
                             <td>${med.quadril ? med.quadril : '--'}</td>
                             <td>
-                                <button class="btn btn-danger" onclick="deletarRegistro('${reg.timestamp}')">X</button>
+                                <button class="btn btn-danger" onclick="deletarRegistro('${timestamp}', '${data}')">X</button>
                             </td>
                         </tr>
                     `;
@@ -1278,17 +1302,31 @@
             });
         }
 
-        function deletarRegistro(timestamp) {
+        function deletarRegistro(timestamp, data) {
             if (!confirm('Tem certeza que quer deletar este registro?')) return;
 
             if (!currentUser) return;
 
+            // Deletar peso se existir
             db.ref(`users/${currentUser.uid}/peso_registros`).orderByChild('timestamp')
                 .equalTo(timestamp).once('value', (snapshot) => {
                     snapshot.forEach((child) => {
                         child.ref.remove();
                     });
                 });
+
+            // Deletar medidas da mesma data se existirem
+            if (data) {
+                db.ref(`users/${currentUser.uid}/medidas_registros`).orderByChild('data')
+                    .equalTo(data).once('value', (snapshot) => {
+                        snapshot.forEach((child) => {
+                            child.ref.remove();
+                        });
+                    });
+            }
+
+            // Atualizar histórico
+            setTimeout(() => carregarDados(), 500);
         }
 
         // ===== CALCULADORA =====
