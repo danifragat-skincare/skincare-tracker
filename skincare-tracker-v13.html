@@ -1031,7 +1031,7 @@
 
             db.ref(`users/${currentUser.uid}/medidas_registros`).push(novoRegistro)
                 .then(() => {
-                    alert('✓ Medidas salvas com sucesso!');
+                    console.log('✓ Medidas salvas com sucesso!');
                     document.getElementById('medidaPeito').value = '';
                     document.getElementById('medidaCintura').value = '';
                     document.getElementById('medidaQuadril').value = '';
@@ -1040,7 +1040,6 @@
                 })
                 .catch(err => {
                     console.error('Erro ao registrar medidas:', err);
-                    alert('Erro ao salvar medidas. Tente novamente.');
                 });
         }
 
