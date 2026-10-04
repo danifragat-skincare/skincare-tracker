@@ -1072,13 +1072,8 @@
         function carregarDados() {
             if (!currentUser) return;
 
-            // Remover listeners antigos antes de adicionar novos
-            db.ref('users/'+currentUser.uid).off();
-            db.ref(`users/${currentUser.uid}/meta_peso`).off();
-            db.ref(`users/${currentUser.uid}/peso_registros`).off();
-
             // Carregar rotina e peptídeos
-            db.ref('users/'+currentUser.uid).on('value', (snapshot) => {
+            db.ref('users/'+currentUser.uid).once('value', (snapshot) => {
                 const data = snapshot.val()||{};
                 displayRotina('rotinaManha', data.rotinas?.manha||{}, 'manha');
                 displayRotina('rotinaNoite', data.rotinas?.noite||{}, 'noite');
@@ -1087,7 +1082,7 @@
             });
 
             // Carregar meta de peso
-            db.ref(`users/${currentUser.uid}/meta_peso`).on('value', (snapshot) => {
+            db.ref(`users/${currentUser.uid}/meta_peso`).once('value', (snapshot) => {
                 if (snapshot.exists()) {
                     metaAtual = snapshot.val();
                     document.getElementById('pesoAlvo').value = metaAtual.pesoAlvo;
@@ -1098,7 +1093,7 @@
             });
 
             // Carregar registros de peso
-            db.ref(`users/${currentUser.uid}/peso_registros`).on('value', (snapshot) => {
+            db.ref(`users/${currentUser.uid}/peso_registros`).once('value', (snapshot) => {
                 registrosPeso = [];
                 if (snapshot.exists()) {
                     snapshot.forEach((child) => {
