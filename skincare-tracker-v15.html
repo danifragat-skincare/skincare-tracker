@@ -859,17 +859,30 @@
         </div>
     </div>
 
-    <!-- Modal Adicionar Produto -->
+    <!-- Modal Adicionar/Editar Produto -->
     <div id="addProductModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center;padding:1rem;">
         <div style="background:white;border-radius:1rem;padding:2rem;width:100%;max-width:400px;">
-            <div style="font-size:1.2rem;font-weight:700;margin-bottom:1.5rem;">Adicionar Produto</div>
+            <div id="addProductModalTitle" style="font-size:1.2rem;font-weight:700;margin-bottom:1.5rem;">Adicionar Produto</div>
             <form onsubmit="saveProduct(event)">
+                <input type="hidden" id="productEditId" value="">
                 <div class="form-group"><label>Nome *</label><input type="text" id="productNome" required style="width:100%;padding:0.75rem;border:1px solid #e2e8f0;border-radius:0.5rem;font-size:1rem;box-sizing:border-box;margin-top:0.25rem;"></div>
                 <div class="form-group"><label>Marca</label><input type="text" id="productMarca" style="width:100%;padding:0.75rem;border:1px solid #e2e8f0;border-radius:0.5rem;font-size:1rem;box-sizing:border-box;margin-top:0.25rem;"></div>
                 <div class="form-group"><label>Tipo</label><select id="productTipo" style="width:100%;padding:0.75rem;border:1px solid #e2e8f0;border-radius:0.5rem;font-size:1rem;margin-top:0.25rem;"><option value="">Selecione</option><option>Limpador</option><option>Tônico</option><option>Sérum</option><option>Hidratante</option><option>Protetor Solar</option><option>Peptídeo Tópico</option><option>Outro</option></select></div>
+                <div class="form-group"><label>Quantas vezes por semana?</label>
+                <div id="productDias" style="display:flex;gap:0.4rem;margin-top:0.4rem;">
+                    <label style="display:flex;flex-direction:column;align-items:center;gap:0.3rem;cursor:pointer;font-size:0.75rem;color:#555;flex:1;"><input type="checkbox" value="dom" style="width:1.2rem;height:1.2rem;cursor:pointer;">D</label>
+                    <label style="display:flex;flex-direction:column;align-items:center;gap:0.3rem;cursor:pointer;font-size:0.75rem;color:#555;flex:1;"><input type="checkbox" value="seg" style="width:1.2rem;height:1.2rem;cursor:pointer;">S</label>
+                    <label style="display:flex;flex-direction:column;align-items:center;gap:0.3rem;cursor:pointer;font-size:0.75rem;color:#555;flex:1;"><input type="checkbox" value="ter" style="width:1.2rem;height:1.2rem;cursor:pointer;">T</label>
+                    <label style="display:flex;flex-direction:column;align-items:center;gap:0.3rem;cursor:pointer;font-size:0.75rem;color:#555;flex:1;"><input type="checkbox" value="qua" style="width:1.2rem;height:1.2rem;cursor:pointer;">Q</label>
+                    <label style="display:flex;flex-direction:column;align-items:center;gap:0.3rem;cursor:pointer;font-size:0.75rem;color:#555;flex:1;"><input type="checkbox" value="qui" style="width:1.2rem;height:1.2rem;cursor:pointer;">Q</label>
+                    <label style="display:flex;flex-direction:column;align-items:center;gap:0.3rem;cursor:pointer;font-size:0.75rem;color:#555;flex:1;"><input type="checkbox" value="sex" style="width:1.2rem;height:1.2rem;cursor:pointer;">S</label>
+                    <label style="display:flex;flex-direction:column;align-items:center;gap:0.3rem;cursor:pointer;font-size:0.75rem;color:#555;flex:1;"><input type="checkbox" value="sab" style="width:1.2rem;height:1.2rem;cursor:pointer;">S</label>
+                </div>
+                <div style="font-size:0.75rem;color:#999;margin-top:0.35rem;">Deixe sem marcar nenhum dia se usa todo dia. Ou marque só os dias que usa (ex: Seg, Qua, Sex).</div>
+                </div>
                 <div class="form-group"><label>Data de início de uso</label><input type="date" id="productDataInicio" style="width:100%;padding:0.75rem;border:1px solid #e2e8f0;border-radius:0.5rem;font-size:1rem;box-sizing:border-box;margin-top:0.25rem;"></div>
                 <div style="display:flex;gap:0.75rem;margin-top:1.5rem;">
-                    <button type="submit" style="flex:1;padding:0.75rem;background:linear-gradient(135deg,#6c63ff,#a78bfa);color:white;border:none;border-radius:0.75rem;font-weight:600;cursor:pointer;">Adicionar</button>
+                    <button type="submit" id="productSubmitBtn" style="flex:1;padding:0.75rem;background:linear-gradient(135deg,#6c63ff,#a78bfa);color:white;border:none;border-radius:0.75rem;font-weight:600;cursor:pointer;">Adicionar</button>
                     <button type="button" onclick="closeAddProductModal()" style="flex:1;padding:0.75rem;background:#f1f5f9;color:#374151;border:none;border-radius:0.75rem;font-weight:600;cursor:pointer;">Cancelar</button>
                 </div>
             </form>
@@ -1439,15 +1452,22 @@
 
         // ===== ROTINA =====
         let currentPeriodoModal = null;
+        let rotinaCache = { manha: {}, noite: {} };
 
         function hojeStr() { return new Date().toISOString().split('T')[0]; }
 
-        function openAddProductModal(periodo) {
+        function openAddProductModal(periodo, editId) {
             currentPeriodoModal = periodo;
-            document.getElementById('productNome').value = '';
-            document.getElementById('productMarca').value = '';
-            document.getElementById('productTipo').value = '';
-            document.getElementById('productDataInicio').value = hojeStr();
+            const p = editId ? (rotinaCache[periodo]||{})[editId] : null;
+            document.getElementById('productEditId').value = editId || '';
+            document.getElementById('addProductModalTitle').textContent = editId ? 'Editar Produto' : 'Adicionar Produto';
+            document.getElementById('productSubmitBtn').textContent = editId ? 'Salvar' : 'Adicionar';
+            document.getElementById('productNome').value = p ? (p.nome||'') : '';
+            document.getElementById('productMarca').value = p ? (p.marca==='Sem marca'?'':p.marca) : '';
+            document.getElementById('productTipo').value = p ? (p.tipo==='Sem tipo'?'':p.tipo) : '';
+            document.getElementById('productDataInicio').value = p ? (p.dataInicio||hojeStr()) : hojeStr();
+            const diasAtivos = (p && p.diasSemana) ? p.diasSemana : [];
+            document.querySelectorAll('#productDias input[type=checkbox]').forEach(cb => { cb.checked = diasAtivos.includes(cb.value); });
             document.getElementById('addProductModal').style.display = 'flex';
         }
         function closeAddProductModal() { document.getElementById('addProductModal').style.display = 'none'; }
@@ -1456,11 +1476,17 @@
             event.preventDefault();
             const nome = document.getElementById('productNome').value;
             if (!nome || !currentUser || !currentPeriodoModal) return;
-            db.ref('users/'+currentUser.uid+'/rotinas/'+currentPeriodoModal+'/'+Date.now()).set({
+            const diasSemana = Array.from(document.querySelectorAll('#productDias input[type=checkbox]:checked')).map(cb => cb.value);
+            const editId = document.getElementById('productEditId').value;
+            const id = editId || Date.now();
+            const existente = editId ? (rotinaCache[currentPeriodoModal]||{})[editId] : null;
+            db.ref('users/'+currentUser.uid+'/rotinas/'+currentPeriodoModal+'/'+id).set({
                 nome, marca: document.getElementById('productMarca').value||'Sem marca',
                 tipo: document.getElementById('productTipo').value||'Sem tipo',
                 dataInicio: document.getElementById('productDataInicio').value||hojeStr(),
-                ultimaAplicacao: null, adicionadoEm: new Date().toISOString()
+                diasSemana,
+                ultimaAplicacao: existente ? (existente.ultimaAplicacao||null) : null,
+                adicionadoEm: existente ? (existente.adicionadoEm||new Date().toISOString()) : new Date().toISOString()
             }).then(() => closeAddProductModal()).catch(e => console.error('Erro: '+e.message));
         }
 
@@ -1475,6 +1501,7 @@
         }
 
         function displayRotina(elementId, rotina, periodo) {
+            rotinaCache[periodo] = rotina || {};
             const c = document.getElementById(elementId);
             const histId = elementId + 'Historico';
             const histEl = document.getElementById(histId);
@@ -1489,7 +1516,9 @@
                 const feitoHoje = p.ultimaAplicacao === hoje;
                 return '<div style="display:flex;align-items:center;gap:0.75rem;padding:0.75rem;background:#f9fafb;border-radius:0.75rem;margin-bottom:0.5rem;'+(feitoHoje?'opacity:0.6;':'')+'">'
                 +'<input type="checkbox" '+(feitoHoje?'checked':'')+' onchange="updateProduto(\''+currentUser.uid+'\',\''+periodo+'\',\''+id+'\',this.checked)" style="width:1.2rem;height:1.2rem;cursor:pointer;">'
-                +'<div style="flex:1;"><div style="font-weight:600;'+(feitoHoje?'text-decoration:line-through;color:#999;':'')+'">'+(p.nome||'')+'</div><div style="font-size:0.8rem;color:#888;">'+(p.marca||'')+(p.tipo?' • '+p.tipo:'')+'</div></div>'
+                +'<div style="flex:1;"><div style="font-weight:600;'+(feitoHoje?'text-decoration:line-through;color:#999;':'')+'">'+(p.nome||'')+'</div><div style="font-size:0.8rem;color:#888;">'+(p.marca||'')+(p.tipo?' • '+p.tipo:'')+'</div>'
+                +(p.diasSemana && p.diasSemana.length ? '<div style="font-size:0.8rem;color:#6c63ff;font-weight:600;margin-top:0.15rem;">📅 '+formatDiasSemana(p.diasSemana)+'</div>' : '')+'</div>'
+                +'<button onclick="openAddProductModal(\''+periodo+'\',\''+id+'\')" style="background:none;border:none;color:#6c63ff;cursor:pointer;font-size:1.1rem;" title="Editar produto">✏️</button>'
                 +'<button onclick="deleteProduto(\''+currentUser.uid+'\',\''+periodo+'\',\''+id+'\')" style="background:none;border:none;color:#ef4444;cursor:pointer;font-size:1.1rem;" title="Excluir produto da rotina">🗑</button></div>';
             }).join('');
             // Histórico/linha do tempo: desde quando cada item está fixo na rotina
