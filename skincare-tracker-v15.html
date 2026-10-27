@@ -459,7 +459,6 @@
 
             <div class="nav-tabs">
                 <button class="nav-tab active" onclick="showSection('rotina')">📅 Rotina</button>
-                <button class="nav-tab" onclick="showSection('peptideos')">💉 Peptídeos</button>
                 <button class="nav-tab" onclick="showSection('calculadora')">🧮 Calculadora</button>
                 <button class="nav-tab" onclick="showSection('produtos')">🧴 Produtos</button>
                 <button class="nav-tab" onclick="showSection('peso-medidas')">⚖️ Peso & Medidas</button>
@@ -773,32 +772,6 @@
                 </div>
             </div>
 
-            <!-- Peptídeos Injetáveis -->
-            <div id="peptideos" class="content-section">
-                <h2 class="section-title">💉 Peptídeos Injetáveis</h2>
-                <div class="card">
-                    <div class="card-title">💉 Registrar Nova Dose</div>
-                    <div style="background:var(--gray-50,#f9fafb);padding:1.5rem;border-radius:0.5rem;margin-bottom:1rem;">
-                        <div class="form-group"><label>Tipo</label>
-                        <select id="peptideoNome" style="width:100%;padding:0.75rem;border:1px solid #e2e8f0;border-radius:0.5rem;font-size:1rem;">
-                            <option value="">Selecione</option>
-                            <option>Tirzepatida 15mg/0,5ml</option>
-                            <option>Retatrutida 40mg</option>
-                            <option>GHK-Cu 50mg</option>
-                            <option>GHK-Cu 100mg</option>
-                            <option>GLOW</option>
-                            <option>BPC-157</option>
-                            <option>TB 500</option>
-                        </select></div>
-                        <div class="form-group"><label>Dose (mg)</label><input type="number" id="dosePeptideo" placeholder="Ex: 3" step="0.1" style="width:100%;padding:0.75rem;border:1px solid #e2e8f0;border-radius:0.5rem;font-size:1rem;box-sizing:border-box;"></div>
-                        <div class="form-group"><label>Local</label><select id="localAplicacao" style="width:100%;padding:0.75rem;border:1px solid #e2e8f0;border-radius:0.5rem;font-size:1rem;"><option value="">Selecione</option><option>Subcutânea</option><option>Intramuscular</option><option>Tópica</option></select></div>
-                        <div class="form-group"><label>Notas (opcional)</label><input type="text" id="notasPeptideo" placeholder="Resultado, sensações..." style="width:100%;padding:0.75rem;border:1px solid #e2e8f0;border-radius:0.5rem;font-size:1rem;box-sizing:border-box;"></div>
-                        <button class="btn-primary" onclick="saveDosePeptideo()">Registrar Dose</button>
-                    </div>
-                </div>
-                <div class="card"><div class="card-title">📋 Histórico</div><div id="historicoPeptideos"><div class="empty-state"><div class="empty-state-icon">📊</div><p>Nenhuma dose registrada</p></div></div></div>
-            </div>
-
             <!-- Calculadora -->
             <div id="calculadora" class="content-section">
                 <h2 class="section-title">🧮 Calculadora de Doses</h2>
@@ -1099,7 +1072,6 @@
                 displayRotina('rotinaManha', data.rotinas?.manha||{}, 'manha');
                 displayRotina('rotinaNoite', data.rotinas?.noite||{}, 'noite');
                 displayPeptideosEmUso(data.peptideos_em_uso||{});
-                displayHistoricoPeptideos(data.peptideos||{});
             });
 
             // Carregar meta de peso
@@ -1503,32 +1475,6 @@
                         +'</div>';
                     }).join('');
             }
-        }
-
-        // ===== HISTÓRICO PEPTÍDEOS =====
-        function displayHistoricoPeptideos(peptideos) {
-            const c = document.getElementById('historicoPeptideos');
-            if (!c) return;
-            if (!peptideos || !Object.keys(peptideos).length) { c.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📊</div><p>Nenhuma dose</p></div>'; return; }
-            c.innerHTML = Object.entries(peptideos).sort((a,b)=>new Date(b[1].data)-new Date(a[1].data)).map(([id,d]) =>
-                '<div style="padding:0.75rem;background:#f9fafb;border-radius:0.75rem;margin-bottom:0.5rem;border-left:3px solid #6c63ff;">'
-                +'<div style="font-weight:700;">'+d.tipo+' — '+d.dosagem+'mg</div>'
-                +'<div style="font-size:0.85rem;color:#666;">'+new Date(d.data).toLocaleDateString('pt-BR')+' • '+d.local+'</div>'
-                +(d.notas?'<div style="font-size:0.85rem;color:#888;margin-top:0.25rem;">📝 '+d.notas+'</div>':'')+'</div>'
-            ).join('');
-        }
-
-        function saveDosePeptideo() {
-            const tipo = document.getElementById('peptideoNome').value;
-            const dosagem = document.getElementById('dosePeptideo').value;
-            const local = document.getElementById('localAplicacao').value;
-            const notas = document.getElementById('notasPeptideo').value;
-            if (!tipo||!dosagem||!local||!currentUser) { console.warn('Preencha todos os campos'); return; }
-            db.ref('users/'+currentUser.uid+'/peptideos/'+Date.now()).set({ tipo, dosagem:parseFloat(dosagem), local, notas, data:new Date().toISOString() })
-                .then(() => {
-                    ['peptideoNome','dosePeptideo','localAplicacao','notasPeptideo'].forEach(id => document.getElementById(id).value='');
-                    console.log('✓ Dose registrada!');
-                }).catch(e => console.error('Erro: '+e.message));
         }
 
         function exportarCSV() {
